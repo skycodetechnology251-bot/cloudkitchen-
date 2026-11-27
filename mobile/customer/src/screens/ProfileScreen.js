@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Linking, Pressable, Text, View } from 'react-native';
-import { api, BASE, rupees } from '../shared/api';
+import { BASE, api, rupees, whatsappUrl } from '../shared/api';
 import { Glass, H1, Muted, Rise } from '../shared/ui';
 import { C } from '../shared/theme';
 import { Screen } from './_Screen';
@@ -35,7 +35,7 @@ export default function ProfileScreen({ navigation }) {
         <Item label="Notifications" note="Push, WhatsApp, SMS, email" onPress={() => navigation.navigate('Notifications')} />
       </Glass></Rise>
       <Rise index={3}><Glass style={{ paddingHorizontal: 16 }}>
-        <Item label="Help & support" onPress={() => Linking.openURL('https://wa.me/?text=' + encodeURIComponent('Daily Table help'))} />
+        <Item label="Help & support" onPress={() => Linking.openURL(whatsappUrl('Help with Daily Table'))} />
         <Item label="Privacy policy" onPress={() => Linking.openURL(BASE + '/privacy')} />
         <Item label="Refunds & cancellation" onPress={() => Linking.openURL(BASE + '/refunds')} />
         <Item label="Log out" onPress={signOut} />

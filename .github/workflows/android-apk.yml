@@ -44,20 +44,22 @@ jobs:
           echo "ANDROID_HOME=$ANDROID_HOME"
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
 
-      - name: Point the app at your backend
+      # One configuration: the apps use the same settings as the Laravel website. Take the latest
+      # from the live site (/api/v1/app-config); if it can't be reached, use mobile/app-config.json.
+      - name: Use the website's settings
+        working-directory: .
         env:
           API_URL: ${{ github.event.inputs.api_url || vars.API_URL }}
-          GOOGLE_ANDROID_CLIENT_ID: ${{ vars.GOOGLE_ANDROID_CLIENT_ID }}
-          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
         run: |
-          node -e "
-            const fs=require('fs'); const a=JSON.parse(fs.readFileSync('app.json'));
-            if (process.env.API_URL) a.expo.extra.apiUrl=process.env.API_URL;
-            if (process.env.GOOGLE_ANDROID_CLIENT_ID && 'googleAndroidClientId' in a.expo.extra) a.expo.extra.googleAndroidClientId=process.env.GOOGLE_ANDROID_CLIENT_ID;
-            if (process.env.GOOGLE_WEB_CLIENT_ID && 'googleWebClientId' in a.expo.extra) a.expo.extra.googleWebClientId=process.env.GOOGLE_WEB_CLIENT_ID;
-            a.expo.android.versionCode=Number(process.env.GITHUB_RUN_NUMBER);
-            fs.writeFileSync('app.json', JSON.stringify(a,null,2));
-            console.log('API:', a.expo.extra.apiUrl);"
+          URL="${API_URL:-$(node -p "require('./mobile/app-config.json').api_url" 2>/dev/null || echo https://wownaturals.in)}"
+          URL="${URL%/}"
+          if curl -fsS --max-time 20 "$URL/api/v1/app-config" -o /tmp/app-config.json && node -e "const c=JSON.parse(require('fs').readFileSync('/tmp/app-config.json'));if(!c.api_url)process.exit(1)"; then
+            cp /tmp/app-config.json mobile/app-config.json
+            echo "Using the settings of $URL"
+          else
+            echo "::warning::Could not read $URL/api/v1/app-config - using mobile/app-config.json from the repository."
+          fi
+          cat mobile/app-config.json
 
       - name: Install packages
         run: |

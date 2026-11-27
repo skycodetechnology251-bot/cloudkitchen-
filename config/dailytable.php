@@ -4,6 +4,22 @@ return [
     'version' => '1.4.0',
     'brand' => env('APP_BRAND', 'Daily Table'),
 
+    // Mobile apps (mobile/customer, mobile/rider). Defaults; Admin → Integrations → Mobile apps
+    // and Google sign-in override them. Written to mobile/app-config.json by App\Support\MobileConfig.
+    'mobile' => [
+        'version' => env('MOBILE_VERSION', '1.0.0'),
+        'customer' => ['name' => env('MOBILE_CUSTOMER_NAME', 'Daily Table'), 'package' => env('MOBILE_CUSTOMER_PACKAGE', 'in.dailytable.app'), 'scheme' => 'dailytable', 'color' => '#0F5C4D'],
+        'rider' => ['name' => env('MOBILE_RIDER_NAME', 'Daily Table Rider'), 'package' => env('MOBILE_RIDER_PACKAGE', 'in.dailytable.rider'), 'scheme' => 'dailytablerider', 'color' => '#1F5FA8'],
+        'google' => [
+            'android_client_id' => env('GOOGLE_ANDROID_CLIENT_ID'),
+            'ios_client_id' => env('GOOGLE_IOS_CLIENT_ID'),
+            'web_client_id' => env('GOOGLE_WEB_CLIENT_ID'),
+        ],
+        'eas_project_id' => env('EXPO_PROJECT_ID'),
+        'support_phone' => env('SUPPORT_PHONE'),
+        'support_whatsapp' => env('SUPPORT_WHATSAPP'),
+    ],
+
     // Installation (browser wizard at /install, or php artisan dailytable:install)
     'installed' => env('DAILYTABLE_INSTALLED') === null ? null : filter_var(env('DAILYTABLE_INSTALLED'), FILTER_VALIDATE_BOOL),
     'install_lock' => 'app/private/installed.lock',

@@ -1,7 +1,12 @@
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 
-// Set "extra.apiUrl" in app.json to your server, e.g. https://wownaturals.in
+// The server address comes from the Laravel website's settings (mobile/app-config.json → app.config.js).
+/** Support contacts from the website settings (Admin → Integrations → Mobile apps). */
+export const SUPPORT = Constants.expoConfig?.extra?.support || {};
+/** Opens WhatsApp to the support number (or a share sheet if none is set). */
+export const whatsappUrl = (text) => `https://wa.me/${(SUPPORT.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
+
 export const BASE = (Constants.expoConfig?.extra?.apiUrl || 'http://10.0.2.2:8000').replace(/\/$/, '');
 const API = BASE + '/api/v1';
 const KEY = 'dt_token';

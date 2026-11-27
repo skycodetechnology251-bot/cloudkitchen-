@@ -16,7 +16,12 @@ class GoogleAuthService
             throw ValidationException::withMessages(['id_token' => 'Google sign-in failed. Please try again.']);
         }
         $claims = $res->json();
-        $allowed = array_filter(array_map('trim', explode(',', (string) Setting::get('google', 'client_ids', env('GOOGLE_CLIENT_IDS', '')))));
+        // The app IDs from Admin → Integrations → Google sign-in (the same ones the apps are built with).
+        $g = \App\Support\MobileConfig::build()['google'];
+        $allowed = array_values(array_filter(array_merge(
+            [$g['android_client_id'], $g['ios_client_id'], $g['web_client_id']],
+            array_map('trim', explode(',', (string) Setting::get('google', 'client_ids', env('GOOGLE_CLIENT_IDS', ''))))
+        )));
         if (! in_array($claims['aud'] ?? '', $allowed, true)) {
             throw ValidationException::withMessages(['id_token' => 'This Google sign-in is not allowed for Daily Table.']);
         }

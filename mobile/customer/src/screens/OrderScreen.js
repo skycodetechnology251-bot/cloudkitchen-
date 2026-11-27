@@ -3,7 +3,7 @@ import { Alert, Animated, Linking, Pressable, RefreshControl, ScrollView, Text, 
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
-import { api, rupees, slotLabel } from '../shared/api';
+import { api, rupees, slotLabel, whatsappUrl } from '../shared/api';
 import { Backdrop, Btn, Glass, IconBtn, Muted, Rise } from '../shared/ui';
 import Icon from '../shared/Icons';
 import { C } from '../shared/theme';
@@ -23,7 +23,7 @@ export default function OrderScreen({ navigation, route }) {
   useEffect(() => { Animated.loop(Animated.timing(pulse, { toValue: 1, duration: 1400, useNativeDriver: true })).start(); }, []);
 
   const back = () => (route.params.fresh ? navigation.navigate('Main', { screen: 'Orders' }) : navigation.goBack());
-  const help = () => Linking.openURL(`https://wa.me/?text=${encodeURIComponent('Help with Daily Table order ' + (o?.number || ''))}`);
+  const help = () => Linking.openURL(whatsappUrl('Help with Daily Table order ' + (o?.number || '')));
   if (!o) return <View style={{ flex: 1, backgroundColor: C.teal }} />;
 
   const rank = RANK[o.status] ?? -1;

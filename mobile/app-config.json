@@ -1,0 +1,34 @@
+{
+    "api_url": "https://wownaturals.in",
+    "brand": "Daily Table",
+    "version": "1.0.0",
+    "customer": {
+        "name": "Daily Table",
+        "package": "in.dailytable.app",
+        "scheme": "dailytable",
+        "color": "#0F5C4D"
+    },
+    "rider": {
+        "name": "Daily Table Rider",
+        "package": "in.dailytable.rider",
+        "scheme": "dailytablerider",
+        "color": "#1F5FA8"
+    },
+    "google": {
+        "android_client_id": null,
+        "ios_client_id": null,
+        "web_client_id": null
+    },
+    "eas_project_id": null,
+    "support": {
+        "phone": null,
+        "whatsapp": null,
+        "email": "hello@wownaturals.in"
+    },
+    "links": {
+        "android": null,
+        "ios": null,
+        "privacy": "https://wownaturals.in/privacy",
+        "terms": "https://wownaturals.in/terms"
+    }
+}

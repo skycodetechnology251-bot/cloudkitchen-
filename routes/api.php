@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     // Public
+    // The same settings the apps were built with (mobile/app-config.json), straight from this site.
+    Route::get('app-config', fn () => response()->json(\App\Support\MobileConfig::build())->header('Cache-Control', 'public, max-age=300'));
     Route::post('auth/otp/request', [Api\AuthController::class, 'requestOtp'])->middleware('throttle:10,1');
     Route::post('auth/otp/verify', [Api\AuthController::class, 'verifyOtp'])->middleware('throttle:20,1');
     Route::post('auth/google', [Api\AuthController::class, 'google'])->middleware('throttle:20,1');

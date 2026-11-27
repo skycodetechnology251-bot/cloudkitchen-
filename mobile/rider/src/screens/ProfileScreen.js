@@ -1,5 +1,6 @@
 import React from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { Alert, Linking, Pressable, Text, View } from 'react-native';
+import { SUPPORT } from '../shared/api';
 import { Glass, Muted } from '../shared/ui';
 import { Screen } from './_Screen';
 import { useRider } from '../rider';
@@ -20,6 +21,7 @@ export default function ProfileScreen() {
         <View style={{ flex: 1 }}><Text style={{ fontSize: 18, fontWeight: '800', color: R.ink }}>{user?.name}</Text><Muted>+91 {user?.phone} · Delivery partner</Muted></View>
       </Glass>
       <Glass style={{ borderRadius: 24, paddingHorizontal: 16 }}>
+        {SUPPORT.phone ? row('Call operations', () => Linking.openURL('tel:' + SUPPORT.phone)) : null}
         {row('Log out', () => Alert.alert('Log out?', 'You will go off duty.', [{ text: 'Cancel', style: 'cancel' }, { text: 'Log out', onPress: signOut }]), true)}
       </Glass>
       <Muted style={{ textAlign: 'center', fontSize: 11 }}>Daily Table Rider · v1.0.0</Muted>

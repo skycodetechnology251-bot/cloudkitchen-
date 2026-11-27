@@ -149,6 +149,7 @@ class Installer
 
         Upgrader::recordVersion($existing ? Upgrader::installedVersion() : null);
         InstallState::writeLock();
+        \App\Support\MobileConfig::write(); // the apps use the same website address and settings
 
         return ['updated' => $existing, 'created' => $created, 'email' => $email, 'demo_password' => $demoPassword, 'backup' => $result['backup']];
     }

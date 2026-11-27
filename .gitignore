@@ -1,3 +1,10 @@
+# Laravel
+/.env
+/public/storage
+/storage/*.key
+/storage/app/private/backups
+
+# Mobile apps (inside this Laravel project, in mobile/)
 node_modules/
 .expo/
 mobile/*/android/

@@ -99,6 +99,8 @@ class Upgrader
             $task('Recording version '.$to, fn () => self::recordVersion($from));
         }
 
+        $task('Mobile app settings', fn () => \App\Support\MobileConfig::write());
+
         $task('Refreshing caches', function () {
             $cached = file_exists(base_path('bootstrap/cache/config.php'));
             Artisan::call('optimize:clear');
