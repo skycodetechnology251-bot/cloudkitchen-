@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Easing, Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { Animated, DeviceEventEmitter, Dimensions, Easing, Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
 import { api, localToday, rupees, windowShort } from '../shared/api';
@@ -10,6 +10,7 @@ import { C } from '../shared/theme';
 import { Screen } from './_Screen';
 import { useAuth } from '../auth';
 import { useCart } from '../cart';
+import { addGlass, getLog, getSettings, todayKey, WATER_EVENT } from '../water';
 
 const W = Dimensions.get('window').width - 40;
 export const PARTS = (diet) => [['grains', 'Grains', C.grains], ['protein', diet === 'veg' ? 'Dal & sambar' : 'Protein', C.protein], ['veg', 'Vegetables', C.veg], ['dairy', 'Curd', C.dairy]];
@@ -73,6 +74,30 @@ function PlateCard({ it, onOpen, onAdd }) {
             ? <Pressable onPress={onAdd} accessibilityRole="button" accessibilityLabel={`Add ${d.name}`} style={{ height: 44, paddingHorizontal: 16, borderRadius: 999, backgroundColor: C.teal, flexDirection: 'row', alignItems: 'center', gap: 6 }}><Text style={{ color: '#fff', fontWeight: '800', fontSize: 15 }}>{rupees(it.price_paise)}</Text><Icon name="plus" size={16} color="#fff" width={2.6} /></Pressable>
             : <Tag label="Sold out" bg={C.bad} color={C.badInk} />}
         </View>
+      </Glass>
+    </Pressable>
+  );
+}
+
+/** Today's water: glasses so far, a quick + button, and a way into the reminders. */
+function WaterCard({ onOpen }) {
+  const [n, setN] = useState(0);
+  const [goal, setGoal] = useState(8);
+  const [on, setOn] = useState(false);
+  const read = useCallback(async () => { const [l, s] = await Promise.all([getLog(), getSettings()]); setN(l[todayKey()] || 0); setGoal(s.goal); setOn(s.enabled); }, []);
+  useFocusEffect(useCallback(() => { read(); }, [read]));
+  useEffect(() => { const sub = DeviceEventEmitter.addListener(WATER_EVENT, read); return () => sub.remove(); }, [read]);
+  const plus = async () => { const l = await addGlass(1); setN(l[todayKey()] || 0); };
+  return (
+    <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={`Water: ${n} of ${goal} glasses today. Open water reminders`}>
+      <Glass style={{ flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 22, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1.5, borderColor: 'rgba(86,204,242,0.6)' }}>
+        <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: '#2F80ED', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 22 }}>💧</Text></View>
+        <View style={{ flex: 1, gap: 6 }}>
+          <Text style={{ fontWeight: '800', fontSize: 14, color: C.ink }}>{n} of {goal} glasses of water{n >= goal ? ' · goal reached 🎉' : ''}</Text>
+          <View style={{ flexDirection: 'row', gap: 3 }}>{Array.from({ length: goal }, (_, i) => <View key={i} style={{ flex: 1, height: 6, borderRadius: 3, backgroundColor: i < n ? '#2F80ED' : 'rgba(47,128,237,0.15)' }} />)}</View>
+          <Text style={{ fontSize: 12, color: '#405A54' }}>{on ? 'Reminders on · phone and watch' : 'Tap to turn on reminders'}</Text>
+        </View>
+        <Pressable onPress={plus} hitSlop={8} accessibilityRole="button" accessibilityLabel="Add a glass of water" style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(47,128,237,0.12)', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 22, fontWeight: '800', color: '#2F80ED' }}>+</Text></Pressable>
       </Glass>
     </Pressable>
   );
@@ -230,6 +255,8 @@ export default function HomeScreen({ navigation }) {
           <Pressable onPress={() => navigation.navigate('Menu')} accessibilityRole="button" style={{ alignSelf: 'center', padding: 8 }}><Text style={{ color: C.teal, fontWeight: '800' }}>See the full menu · {menu.items.length} dishes ›</Text></Pressable>
         </Rise>
       ) : null}
+
+      <Rise index={5}><WaterCard onOpen={() => navigation.navigate('Water')} /></Rise>
 
       <Modal transparent visible={!!popup} animationType="fade" onRequestClose={() => setPopup(null)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(10,30,25,0.45)', alignItems: 'center', justifyContent: 'center', padding: 28 }}>

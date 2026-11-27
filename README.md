@@ -187,3 +187,19 @@ Admin → Branding (needs "Manage integrations & keys"):
 - **Fonts:** pick a heading font and a text font from 22 Google Fonts. The live preview shows them before you save.
 
 Uploaded logos are stored in `public/uploads/brand/` (keep this folder when you move servers). The apps receive the name and logo address in `/api/v1/app-config`; the app icon itself changes only with a new APK build.
+
+## Drinking water reminders and watches (customer app)
+
+Profile → 💧 Drink water (also a water card on the Today screen):
+
+- Count glasses (goal 6–12 a day), see the last 7 days.
+- Reminders every 1, 1½, 2 or 3 hours between the hours you choose, as local notifications. Settings stay on the phone; nothing is sent to the server.
+- Each reminder has two buttons: **I drank a glass** and **In 30 min**.
+- **Android watches (Wear OS: Galaxy Watch, Pixel Watch…)** and **Apple Watch** show the reminders, buttons included, through the watch's normal phone-notification mirroring. No separate watch app is needed. A tap on the watch is counted straight away if the app is running in the background, otherwise the next time the app opens.
+
+## iPhone
+
+The same app code runs on iPhone. In GitHub → Actions → **iPhone app** → Run workflow:
+
+- **simulator**: builds the app for the iPhone Simulator (Xcode on a Mac). No Apple account needed. Download the artifact, unzip it and drag the `.app` onto a running Simulator.
+- **device**: builds a real iPhone app on Expo EAS. Needs an Apple Developer account (99 USD a year), the `EXPO_TOKEN` repository secret, and a one-time `npx eas-cli build:configure` in `mobile/customer`.

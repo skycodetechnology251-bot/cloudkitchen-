@@ -49,7 +49,7 @@ module.exports = function makeConfig(which) {
       userInterfaceStyle: 'light',
       icon: './assets/icon.png',
       splash: { image: './assets/icon.png', resizeMode: 'contain', backgroundColor: app.color },
-      ios: { bundleIdentifier: app.package, supportsTablet: false, infoPlist: { NSLocationWhenInUseUsageDescription: location } },
+      ios: { bundleIdentifier: app.package, buildNumber: String(versionCode), supportsTablet: false, infoPlist: { NSLocationWhenInUseUsageDescription: location, ITSAppUsesNonExemptEncryption: false } },
       android: {
         package: app.package,
         versionCode,

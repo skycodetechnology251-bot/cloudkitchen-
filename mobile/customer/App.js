@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -25,6 +25,8 @@ import WalletScreen from './src/screens/WalletScreen';
 import AddressesScreen from './src/screens/AddressesScreen';
 import AddressFormScreen from './src/screens/AddressFormScreen';
 import NotificationsScreen from './src/screens/NotificationsScreen';
+import WaterScreen from './src/screens/WaterScreen';
+import { listenWater, processLastResponse, setupWater } from './src/water';
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -69,6 +71,7 @@ function Root() {
           <Stack.Screen name="AddressForm" component={AddressFormScreen} />
           <Stack.Screen name="HealthEdit" component={HealthScreen} />
           <Stack.Screen name="Notifications" component={NotificationsScreen} />
+          <Stack.Screen name="Water" component={WaterScreen} />
         </>
       )}
     </Stack.Navigator>
@@ -76,6 +79,7 @@ function Root() {
 }
 
 export default function App() {
+  useEffect(() => { setupWater(); processLastResponse(); return listenWater(); }, []);
   return (
     <SafeAreaProvider>
       <AuthProvider>

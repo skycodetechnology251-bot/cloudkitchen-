@@ -30,6 +30,7 @@ export default function ProfileScreen({ navigation }) {
       </Rise>
       <Rise index={2}><Glass style={{ paddingHorizontal: 16 }}>
         <Item label="Wallet & top-up" note="Daily lunch auto-pay, low balance reminder" onPress={() => navigation.navigate('Wallet')} />
+        <Item label="💧 Drink water" note="Reminders on your phone and watch" onPress={() => navigation.navigate('Water')} />
         <Item label="Food & health" note={user?.has_health_profile ? 'Diet, allergies, height & weight' : 'Not set up yet'} onPress={() => navigation.navigate('HealthEdit')} />
         <Item label="Saved addresses" onPress={() => navigation.navigate('Addresses')} />
         <Item label="Notifications" note="Push, WhatsApp, SMS, email" onPress={() => navigation.navigate('Notifications')} />
