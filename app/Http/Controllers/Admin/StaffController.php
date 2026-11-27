@@ -29,7 +29,7 @@ class StaffController extends CrudController
 
     protected function query()
     {
-        return User::with('role')->whereNotNull('role_id')->latest('id');
+        return auth()->user()->limitStaffToBranches(User::with('role')->whereNotNull('role_id'))->latest('id');
     }
 
     protected function fields(?Model $item): array
@@ -38,12 +38,26 @@ class StaffController extends CrudController
             'name' => ['label' => 'Full name', 'rules' => 'required|string|max:80'],
             'email' => ['label' => 'Work email (web login)', 'rules' => 'nullable|email|unique:users,email'.($item ? ','.$item->id : '')],
             'phone' => ['label' => 'Mobile (app login)', 'rules' => ['nullable', 'regex:/^[6-9]\d{9}$/', 'unique:users,phone'.($item ? ','.$item->id : '')]],
-            'role_id' => ['label' => 'Role', 'type' => 'select', 'options' => Role::where('is_staff', true)->pluck('name', 'id')->all(), 'rules' => 'required|exists:roles,id'],
-            'kitchen_ids' => ['label' => 'Branches they work in', 'type' => 'multiselect', 'options' => Kitchen::pluck('name', 'id')->all(), 'value' => $item?->kitchens()->pluck('kitchens.id')->all() ?? [], 'rules' => 'nullable|array'],
+            'role_id' => ['label' => 'Role', 'type' => 'select', 'options' => $this->roleOptions(), 'rules' => ['required', \Illuminate\Validation\Rule::in(array_keys($this->roleOptions()))]],
+            'kitchen_ids' => ['label' => 'Branches they work in', 'type' => 'multiselect', 'options' => auth()->user()->accessibleKitchens()->pluck('name', 'id')->all(), 'value' => $item?->kitchens()->pluck('kitchens.id')->all() ?? [], 'rules' => ['nullable', 'array', function ($a, $v, $fail) {
+                if (array_diff(array_map('intval', (array) $v), auth()->user()->accessibleKitchens()->pluck('id')->all())) {
+                    $fail('You can only choose your own branches.');
+                }
+            }]],
             'password' => ['label' => $item ? 'New password (leave blank to keep)' : 'Password', 'type' => 'password', 'rules' => ($item ? 'nullable' : 'required_with:email|nullable').'|min:10'],
             'pos_pin' => ['label' => 'POS PIN (4–6 digits)', 'type' => 'password', 'rules' => 'nullable|digits_between:4,6'],
             'is_active' => ['label' => 'Active', 'type' => 'checkbox'],
         ] + $this->salaryFields($item);
+    }
+
+    /** Branch-level managers can't hand out head-office roles (any role that sees every branch). */
+    private function roleOptions(): array
+    {
+        $roles = Role::with('permissions')->where('is_staff', true)->get();
+        if (! auth()->user()->seesAllKitchens()) {
+            $roles = $roles->reject(fn ($r) => $r->slug === 'admin' || $r->permissions->contains('slug', 'branches.all'));
+        }
+        return $roles->pluck('name', 'id')->all();
     }
 
     /** Own salary for this person; blank fields use the salary set on their role (Admin → Roles). */
@@ -65,8 +79,17 @@ class StaffController extends CrudController
 
     protected function filled(Model $item, array $data, Request $r): void
     {
-        $kitchens = $data['kitchen_ids'] ?? [];
+        $u = $r->user();
+        $kitchens = array_map('intval', $data['kitchen_ids'] ?? []);
         unset($data['kitchen_ids']);
+        if ($u->branchIds() !== null) {
+            // Keep this person's other branches, and put new staff in the manager's branch.
+            $mine = $u->accessibleKitchens()->pluck('id')->all();
+            $kitchens = array_merge($kitchens, $item->exists ? $item->kitchens()->whereNotIn('kitchens.id', $mine)->pluck('kitchens.id')->all() : []);
+            if (! $kitchens) {
+                $kitchens = array_slice($mine, 0, 1);
+            }
+        }
         if (isset($data['pos_pin'])) {
             $data['pos_pin'] = Hash::make($r->input('pos_pin'));
         }

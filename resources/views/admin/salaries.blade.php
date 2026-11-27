@@ -17,6 +17,7 @@
   <div class="row between" style="align-items:flex-end;gap:16px;position:relative;z-index:1">
     <div>
       <h1>Salaries &amp; payroll</h1>
+      <span class="chip" style="background:rgba(255,255,255,.22);color:#fff;margin-bottom:6px">Showing: {{ $scope }}</span>
       <p>Set how each role is paid, give anyone their own amount in Staff, then pay everyone each month. Every payment is saved as a salary expense in Reports, with a payslip.</p>
     </div>
     <form method="get" class="row" style="gap:6px;background:rgba(255,255,255,.16);padding:6px;border-radius:999px;flex-wrap:nowrap">
@@ -32,7 +33,7 @@
 <div class="row between" style="margin-bottom:16px;gap:12px">
   <nav class="seg" aria-label="Sections">
     <a class="{{ $tab === 'payroll' ? 'on' : '' }}" href="?tab=payroll&month={{ $m }}" @if($tab === 'payroll') aria-current="page" @endif>Payroll · {{ $month->format('F Y') }}</a>
-    <a class="{{ $tab === 'roles' ? 'on' : '' }}" href="?tab=roles&month={{ $m }}" @if($tab === 'roles') aria-current="page" @endif>Salary by role</a>
+    @if($all)<a class="{{ $tab === 'roles' ? 'on' : '' }}" href="?tab=roles&month={{ $m }}" @if($tab === 'roles') aria-current="page" @endif>Salary by role</a>@endif
   </nav>
   @if($tab === 'payroll')
     <div class="row" style="gap:8px;flex-wrap:nowrap">

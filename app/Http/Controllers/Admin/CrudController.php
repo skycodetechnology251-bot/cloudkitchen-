@@ -51,7 +51,7 @@ abstract class CrudController extends Controller
 
     public function edit($id)
     {
-        $item = $this->model::findOrFail($id);
+        $item = $this->query()->findOrFail($id);
         return view('admin.crud.form', ['item' => $item, 'fields' => $this->fields($item), 'title' => 'Edit '.Str::singular($this->title), 'route' => $this->route]);
     }
 
@@ -65,7 +65,7 @@ abstract class CrudController extends Controller
 
     public function update(Request $r, $id)
     {
-        $item = $this->model::findOrFail($id);
+        $item = $this->query()->findOrFail($id);
         $this->filled($item, $this->validated($r, $item), $r);
         AuditService::log($this->route.'.update', $item);
         return redirect()->route($this->route.'.index')->with('status', 'Saved.');
@@ -74,7 +74,7 @@ abstract class CrudController extends Controller
     public function destroy($id)
     {
         abort_unless($this->canDelete, 403);
-        $item = $this->model::findOrFail($id);
+        $item = $this->query()->findOrFail($id);
         AuditService::log($this->route.'.delete', $item);
         $item->delete();
         return back()->with('status', 'Deleted.');

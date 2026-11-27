@@ -15,6 +15,13 @@ class ZoneController extends CrudController
     protected string $route = 'admin.zones';
     protected array $columns = ['name' => 'Zone', 'city' => 'City', 'state' => 'State', 'status' => 'Status', 'version' => 'Boundary version'];
 
+    /** Head office sees every zone; a branch sees its own zones and ones not given to any branch yet. */
+    protected function query()
+    {
+        $ids = auth()->user()->branchIds();
+        return Zone::latest('id')->when($ids !== null, fn ($q) => $q->where(fn ($w) => $w->whereHas('kitchens', fn ($k) => $k->whereIn('kitchens.id', $ids))->orWhereDoesntHave('kitchens')));
+    }
+
     protected function fields(?Model $item): array
     {
         return [
@@ -34,7 +41,11 @@ class ZoneController extends CrudController
             'pincode' => ['type' => 'embedded', 'rules' => ['nullable', 'regex:/^[A-Za-z0-9 -]{3,12}$/']],
             'center_lat' => ['type' => 'embedded', 'rules' => 'nullable|numeric|between:-90,90'],
             'center_lng' => ['type' => 'embedded', 'rules' => 'nullable|numeric|between:-180,180'],
-            'kitchen_ids' => ['label' => 'Branches that deliver here', 'type' => 'multiselect', 'options' => \App\Models\Kitchen::orderBy('name')->pluck('name', 'id')->all(), 'value' => $item?->kitchens()->pluck('kitchens.id')->all() ?? [], 'rules' => 'nullable|array', 'help' => 'Add a new branch in Branches; it can create its zones there too.'],
+            'kitchen_ids' => ['label' => 'Branches that deliver here', 'type' => 'multiselect', 'options' => auth()->user()->accessibleKitchens()->pluck('name', 'id')->all(), 'value' => $item?->kitchens()->pluck('kitchens.id')->all() ?? [], 'rules' => ['nullable', 'array', function ($a, $v, $fail) {
+                if (array_diff(array_map('intval', (array) $v), auth()->user()->accessibleKitchens()->pluck('id')->all())) {
+                    $fail('You can only choose your own branches.');
+                }
+            }], 'help' => 'Add a new branch in Branches; it can create its zones there too.'],
             'status' => ['label' => 'Status', 'type' => 'select', 'options' => ['draft' => 'Draft', 'testing' => 'Testing', 'paused' => 'Paused', 'closed' => 'Closed'], 'rules' => 'required|in:draft,testing,paused,closed', 'help' => 'Going live needs approval: use "Approve go-live" on the list.'],
             'seo_title' => ['label' => 'Area page title (SEO)', 'rules' => 'nullable|string|max:120'],
             'seo_description' => ['label' => 'Area page description (SEO)', 'type' => 'textarea', 'rules' => 'nullable|string|max:300'],
@@ -53,8 +64,17 @@ class ZoneController extends CrudController
         if ($item->exists && $item->polygon != $data['polygon']) {
             $item->version++;
         }
+        $u = $r->user();
         $kitchens = array_map('intval', $data['kitchen_ids'] ?? []);
         unset($data['kitchen_ids']);
+        $mine = $u->accessibleKitchens()->pluck('id')->all();
+        if ($u->branchIds() !== null) {
+            // Keep links to branches this person can't see, and give a new zone to their own branch.
+            $kitchens = array_merge($kitchens, $item->exists ? $item->kitchens()->whereNotIn('kitchens.id', $mine)->pluck('kitchens.id')->all() : []);
+            if (! $kitchens) {
+                $kitchens = $mine;
+            }
+        }
         if (! $item->slug) {
             $base = Str::slug($data['name']) ?: 'zone';
             $item->slug = $base;
@@ -68,6 +88,7 @@ class ZoneController extends CrudController
 
     public function goLive(Zone $zone)
     {
+        abort_unless($this->query()->whereKey($zone->id)->exists(), 403, 'This zone belongs to another branch.');
         $checks = [
             'boundary' => count($zone->polygon ?? []) >= 3,
             'kitchen' => $zone->kitchens()->where('is_open', true)->exists(),

@@ -21,25 +21,29 @@ class BranchController extends Controller
 {
     public function index()
     {
+        $u = auth()->user();
         $today = now(config('dailytable.timezone'))->toDateString();
-        $branches = Kitchen::with(['zones:id,name,status'])->withCount('staff')->orderBy('name')->get();
-        $stats = Order::whereDate('service_date', $today)->where('payment_status', '!=', 'pending')
+        $branches = $u->limitToBranches(Kitchen::with(['zones:id,name,status'])->withCount('staff'), 'id')->orderBy('name')->get();
+        $stats = $u->limitToBranches(Order::query())->whereDate('service_date', $today)->where('payment_status', '!=', 'pending')
             ->selectRaw('kitchen_id, count(*) as orders, sum(total_paise) as sales')->groupBy('kitchen_id')->get()->keyBy('kitchen_id');
-        return view('admin.branches.index', compact('branches', 'stats'));
+        return view('admin.branches.index', compact('branches', 'stats') + ['all' => $u->seesAllKitchens()]);
     }
 
     public function create()
     {
+        abort_unless(auth()->user()->seesAllKitchens(), 403, 'Only head office can add branches.');
         return $this->form(new Kitchen(['is_open' => true, 'service_radius_m' => 8000]));
     }
 
     public function edit(Kitchen $kitchen)
     {
+        abort_unless(auth()->user()->canSeeBranch($kitchen->id), 403, 'This is another branch.');
         return $this->form($kitchen);
     }
 
     public function store(Request $r)
     {
+        abort_unless($r->user()->seesAllKitchens(), 403, 'Only head office can add branches.');
         $branch = new Kitchen;
         $this->save($branch, $r);
         AuditService::log('admin.branches.create', $branch);
@@ -48,6 +52,7 @@ class BranchController extends Controller
 
     public function update(Request $r, Kitchen $kitchen)
     {
+        abort_unless($r->user()->canSeeBranch($kitchen->id), 403, 'This is another branch.');
         $this->save($kitchen, $r);
         AuditService::log('admin.branches.update', $kitchen);
         return redirect()->route('admin.branches.index')->with('status', "Branch {$kitchen->name} saved.");
@@ -55,6 +60,7 @@ class BranchController extends Controller
 
     public function toggle(Kitchen $kitchen)
     {
+        abort_unless(auth()->user()->canSeeBranch($kitchen->id), 403, 'This is another branch.');
         $kitchen->forceFill(['is_open' => ! $kitchen->is_open])->save();
         AuditService::log('admin.branches.toggle', $kitchen);
         return back()->with('status', $kitchen->name.($kitchen->is_open ? ' is open for orders.' : ' is closed for orders.'));
@@ -62,18 +68,32 @@ class BranchController extends Controller
 
     private function form(Kitchen $branch)
     {
+        $u = auth()->user();
         $mine = $branch->exists ? $branch->zones()->pluck('zones.id')->all() : [];
-        $zones = Zone::with('kitchens:id,name')->orderBy('name')->get();
-        $staff = User::with('role')->whereNotNull('role_id')->where('is_active', true)->orderBy('name')->get()
+        $zones = $this->visibleZones()->with('kitchens:id,name')->orderBy('name')->get();
+        $staff = $u->limitStaffToBranches(User::with('role')->whereNotNull('role_id')->where('is_active', true))->orderBy('name')->get()
             ->groupBy(fn ($u) => $u->role->name ?? 'Staff');
         $team = $branch->exists ? $branch->staff()->pluck('users.id')->all() : [];
+        $ids = $u->branchIds();
+        $zones->each(fn ($z) => $z->setRelation('kitchens', $ids === null ? $z->kitchens : $z->kitchens->whereIn('id', $ids)->values()));
         $overlays = $zones->filter(fn ($z) => count($z->polygon ?? []) > 2)
             ->map(fn ($z) => ['name' => $z->name, 'polygon' => $z->polygon, 'mine' => in_array($z->id, $mine)])->values()->all();
         return view('admin.branches.form', compact('branch', 'zones', 'mine', 'staff', 'team', 'overlays'));
     }
 
+    /** Zones a person may pick: every zone for head office; for a branch, its own zones and unassigned ones. */
+    private function visibleZones()
+    {
+        $ids = auth()->user()->branchIds();
+        return $ids === null ? Zone::query()
+            : Zone::where(fn ($q) => $q->whereHas('kitchens', fn ($k) => $k->whereIn('kitchens.id', $ids))->orWhereDoesntHave('kitchens'));
+    }
+
     private function save(Kitchen $branch, Request $r): void
     {
+        $u = $r->user();
+        $allowedZones = $this->visibleZones()->pluck('id')->all();
+        $allowedStaff = $u->limitStaffToBranches(User::whereNotNull('role_id'))->pluck('id')->all();
         $d = $r->validate([
             'name' => 'required|string|max:80',
             'legal_name' => 'nullable|string|max:120',
@@ -91,9 +111,9 @@ class BranchController extends Controller
             'lng' => 'required|numeric|between:-180,180',
             'radius_km' => 'required|numeric|min:0.5|max:50',
             'zone_ids' => 'nullable|array',
-            'zone_ids.*' => 'integer|exists:zones,id',
+            'zone_ids.*' => ['integer', \Illuminate\Validation\Rule::in($allowedZones)],
             'staff_ids' => 'nullable|array',
-            'staff_ids.*' => 'integer|exists:users,id',
+            'staff_ids.*' => ['integer', \Illuminate\Validation\Rule::in($allowedStaff)],
             'new_zones' => 'nullable|array|max:10',
             'new_zones.*.name' => 'nullable|string|max:60',
             'new_zones.*.radius' => 'nullable|numeric|min:0.5|max:30',
@@ -135,7 +155,9 @@ class BranchController extends Controller
             }
 
             $branch->zones()->sync($zoneIds);
-            $branch->staff()->sync(array_map('intval', $d['staff_ids'] ?? []));
+            // A branch manager only changes the people they can see; others at this branch stay.
+            $hidden = $branch->exists ? $branch->staff()->whereNotIn('users.id', $allowedStaff)->pluck('users.id')->all() : [];
+            $branch->staff()->sync(array_merge(array_map('intval', $d['staff_ids'] ?? []), $hidden));
         });
     }
 

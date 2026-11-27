@@ -46,8 +46,10 @@ class SalaryController extends Controller
         $month = $this->month($r);
         $key = $month->format('Y-m');
         $deliveries = $this->deliveries($month);
-        $paid = SalaryPayment::where('month', $key)->get()->keyBy('user_id');
-        $staff = User::with('role')->whereNotNull('role_id')->whereHas('role', fn ($q) => $q->where('is_staff', true))
+        $u = $r->user();
+        $visible = $u->limitStaffToBranches(User::whereNotNull('role_id'))->pluck('id');
+        $paid = SalaryPayment::where('month', $key)->whereIn('user_id', $visible)->get()->keyBy('user_id');
+        $staff = $u->limitStaffToBranches(User::with('role'))->whereNotNull('role_id')->whereHas('role', fn ($q) => $q->where('is_staff', true))
             ->where(fn ($q) => $q->where('is_active', true)->orWhereIn('id', $paid->keys()))->orderBy('name')->get();
 
         $rows = $staff->map(function (User $u) use ($deliveries, $paid) {
@@ -68,12 +70,15 @@ class SalaryController extends Controller
             'roles' => Role::where('is_staff', true)->withCount(['users' => fn ($q) => $q->where('is_active', true)])->orderBy('id')->get(),
             'types' => Role::SALARY_TYPES,
             'totalPaid' => $paid->sum('net_paise'),
-            'tab' => $r->input('tab', 'payroll'),
+            'tab' => $u->seesAllKitchens() ? $r->input('tab', 'payroll') : 'payroll',
+            'all' => $u->seesAllKitchens(),
+            'scope' => $u->branchScopeLabel(),
         ]);
     }
 
     public function updateRole(Request $r, Role $role): RedirectResponse
     {
+        abort_unless($r->user()->seesAllKitchens(), 403, 'Role salaries apply to every branch, so only head office can change them.');
         $d = $r->validate([
             'salary_type' => ['required', Rule::in(array_keys(Role::SALARY_TYPES))],
             'salary' => 'nullable|numeric|min:0|max:1000000',
@@ -92,6 +97,7 @@ class SalaryController extends Controller
 
     public function pay(Request $r, User $user): RedirectResponse
     {
+        abort_unless($r->user()->canSeeStaff($user), 403, 'This person works at another branch.');
         $month = $this->month($r);
         $key = $month->format('Y-m');
         $plan = $user->salaryPlan();
@@ -120,7 +126,8 @@ class SalaryController extends Controller
         if ($net <= 0) {
             return back()->withErrors(['pay_'.$user->id => 'Pay for '.$user->name.' comes to ₹0. Set a salary for the role or this person first.'])->withInput();
         }
-        $kitchenId = $user->kitchens()->value('kitchens.id') ?? Kitchen::orderBy('id')->value('id');
+        // Book the salary as an expense of a branch this person works at (and the payer can see).
+        $kitchenId = $r->user()->limitToBranches($user->kitchens(), 'kitchens.id')->value('kitchens.id') ?? ($r->user()->seesAllKitchens() ? Kitchen::orderBy('id')->value('id') : null);
         if (! $kitchenId) {
             return back()->withErrors(['pay_'.$user->id => 'Add a kitchen first (Admin → Kitchens): salaries are recorded as kitchen expenses.']);
         }
@@ -148,6 +155,7 @@ class SalaryController extends Controller
     /** Undo a payment recorded by mistake (also removes its expense). */
     public function destroy(SalaryPayment $payment): RedirectResponse
     {
+        abort_unless(auth()->user()->canSeeStaff($payment->user), 403, 'This person works at another branch.');
         DB::transaction(function () use ($payment) {
             AuditService::log('salary.undone', $payment, ['user' => $payment->user_id, 'month' => $payment->month, 'net_paise' => $payment->net_paise]);
             $expense = $payment->expense;
@@ -160,6 +168,7 @@ class SalaryController extends Controller
 
     public function payslip(SalaryPayment $payment): View
     {
+        abort_unless(auth()->user()->canSeeStaff($payment->user), 403, 'This person works at another branch.');
         $payment->load('user.role', 'user.kitchens', 'payer');
 
         return view('admin.payslip', ['p' => $payment]);

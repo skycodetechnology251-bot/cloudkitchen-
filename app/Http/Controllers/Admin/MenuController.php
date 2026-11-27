@@ -14,7 +14,7 @@ class MenuController extends Controller
 {
     public function index(Request $r)
     {
-        $kitchens = Kitchen::orderBy('name')->get();
+        $kitchens = $r->user()->accessibleKitchens();
         $kitchen = $kitchens->firstWhere('id', (int) $r->input('kitchen')) ?? $kitchens->first();
         $date = $r->input('date', now('Asia/Kolkata')->addDay()->toDateString());
         $menu = $kitchen ? DailyMenu::with('dish')->where('kitchen_id', $kitchen->id)->whereDate('service_date', $date)->get()->keyBy('dish_id') : collect();
@@ -28,6 +28,7 @@ class MenuController extends Controller
             'kitchen_id' => 'required|exists:kitchens,id', 'date' => 'required|date|after_or_equal:today',
             'rows' => 'array', 'rows.*.on' => 'nullable', 'rows.*.price' => 'nullable|numeric|min:1', 'rows.*.capacity' => 'nullable|integer|min:0', 'cutoff' => 'required|date_format:H:i',
         ]);
+        abort_unless($r->user()->canSeeBranch((int) $d['kitchen_id']), 403, 'You can only publish the menu for your own branch.');
         foreach ($d['rows'] ?? [] as $dishId => $row) {
             $existing = DailyMenu::where(['kitchen_id' => $d['kitchen_id'], 'dish_id' => $dishId, 'meal' => 'lunch'])->whereDate('service_date', $d['date'])->first();
             if (empty($row['on'])) {
@@ -53,6 +54,7 @@ class MenuController extends Controller
     public function copy(Request $r)
     {
         $d = $r->validate(['kitchen_id' => 'required|exists:kitchens,id', 'from' => 'required|date', 'to' => 'required|date|after_or_equal:today']);
+        abort_unless($r->user()->canSeeBranch((int) $d['kitchen_id']), 403, 'You can only copy the menu for your own branch.');
         $n = 0;
         foreach (DailyMenu::where('kitchen_id', $d['kitchen_id'])->whereDate('service_date', $d['from'])->get() as $m) {
             DailyMenu::firstOrCreate(['kitchen_id' => $m->kitchen_id, 'dish_id' => $m->dish_id, 'service_date' => $d['to'], 'meal' => $m->meal], ['price_paise' => $m->price_paise, 'capacity' => $m->capacity, 'cutoff_at' => $m->cutoff_at]);

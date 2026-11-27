@@ -23,6 +23,7 @@
 <div class="pagehead">
   <h1>Good {{ $hour < 12 ? 'morning' : ($hour < 17 ? 'afternoon' : 'evening') }}, {{ strtok($u->name, ' ') }}</h1>
   <p>{{ now('Asia/Kolkata')->format('l, j F') }} · Ordering for today closes at {{ config('dailytable.ordering.default_cutoff', '10:45') }}. Here is how lunch is going.</p>
+  <p style="margin-top:8px"><span class="chip" style="background:rgba(255,255,255,.22);color:#fff">Showing: {{ $scope }}</span></p>
 </div>
 
 <div class="grid g4" style="margin-bottom:18px">
@@ -41,7 +42,7 @@
   $u->hasPermission('menu.publish') ? [route('admin.menus.index'), 'Daily menu', 'Publish tomorrow', 'calendar', 'amber'] : null,
   $u->hasPermission('fin.reports') ? [route('admin.reports'), 'Reports', 'Income, expenses, GST', 'chart', 'sky'] : null,
   $u->hasPermission('staff.salary') ? [route('admin.salaries'), 'Payroll', 'Pay this month', 'wallet', 'green'] : null,
-  $u->hasPermission('zones.edit') ? [route('admin.branches.create'), 'Add a branch', 'With its zones', 'store', 'purple'] : null,
+  $u->hasPermission('zones.edit') && $u->seesAllKitchens() ? [route('admin.branches.create'), 'Add a branch', 'With its zones', 'store', 'purple'] : null,
   $u->hasPermission('zones.edit') ? [route('admin.zones.create'), 'Add a zone', 'New delivery area', 'pin', 'pink'] : null,
 ]))
 @if($actions)

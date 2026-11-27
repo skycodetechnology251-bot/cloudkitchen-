@@ -5,7 +5,7 @@
 @php($max = max(1, collect($monthly)->max(fn($m) => max($m['income'], $m['expense']))))
 <div class="row between" style="margin-bottom:16px"><h1 style="font-size:28px">Reports</h1>
   <form method="get" class="row" style="flex-wrap:nowrap">
-    <label for="rk" class="sr">Kitchen</label><select id="rk" name="kitchen"><option value="">All kitchens</option>@foreach($kitchens as $id => $n)<option value="{{ $id }}" @selected($kitchenId == $id)>{{ $n }}</option>@endforeach</select>
+    <label for="rk" class="sr">Branch</label><select id="rk" name="kitchen">@if($kitchens->count() > 1 || $scope === 'All branches')<option value="">{{ $scope === 'All branches' ? 'All branches' : 'All my branches' }}</option>@endif @foreach($kitchens as $id => $n)<option value="{{ $id }}" @selected($kitchenId == $id)>{{ $n }}</option>@endforeach</select>
     <label for="rf" class="sr">From</label><input id="rf" type="date" name="from" value="{{ $from->toDateString() }}"><label for="rt" class="sr">To</label><input id="rt" type="date" name="to" value="{{ $to->toDateString() }}">
     <button class="btn small">Show</button>@if(auth()->user()->hasPermission('fin.export'))<a class="btn ghost small" href="{{ route('admin.reports.gst', request()->query()) }}">GST register CSV</a>@endif
   </form></div>
@@ -25,7 +25,7 @@
   <section class="card"><h2 style="font-size:17px;margin-bottom:12px">Expenses by category</h2>
     @php($cmax = max(1, $categories->max()))
     @forelse($categories as $cat => $v)<div style="margin-bottom:10px"><div class="row between small"><b>{{ ucfirst($cat) }}</b><span>₹{{ number_format($v/100) }}</span></div><div style="height:8px;border-radius:99px;background:#EEF3F1"><div class="grow" style="height:8px;border-radius:99px;background:var(--teal);width:{{ round($v/$cmax*100) }}%"></div></div></div>@empty<p class="muted">No expenses recorded.</p>@endforelse
-    <p class="small muted">Owed to customers: wallets ₹{{ number_format($liabilities['wallets']/100) }} · {{ number_format($liabilities['points']) }} reward points</p></section>
+    @if($liabilities)<p class="small muted">Owed to customers: wallets ₹{{ number_format($liabilities['wallets']/100) }} · {{ number_format($liabilities['points']) }} reward points</p>@endif</section>
 </div>
 <section class="card tablebox" style="margin-top:16px"><h2 style="font-size:17px">GST by month</h2>
   <table><thead><tr><th>Month</th><th>Taxable</th><th>CGST</th><th>SGST</th><th>Total GST</th></tr></thead><tbody>

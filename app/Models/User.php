@@ -83,20 +83,66 @@ class User extends Authenticatable
     public function salaryPayments() { return $this->hasMany(SalaryPayment::class); }
 
     /** Admin and operations managers work across every kitchen; other staff only in kitchens assigned to them. */
+    /** Head office: sees and manages every branch. Admin always; other roles if given "branches.all" in Roles. */
     public function seesAllKitchens(): bool
     {
-        return in_array($this->role?->slug, ['admin', 'ops'], true);
+        return $this->hasPermission('branches.all');
+    }
+
+    private ?array $branchIdCache = null;
+    private bool $branchIdLoaded = false;
+
+    /** Branch ids this person may see; null means every branch. */
+    public function branchIds(): ?array
+    {
+        if (! $this->branchIdLoaded) {
+            $this->branchIdCache = $this->seesAllKitchens() ? null : $this->kitchens()->pluck('kitchens.id')->map(fn ($i) => (int) $i)->all();
+            $this->branchIdLoaded = true;
+        }
+        return $this->branchIdCache;
+    }
+
+    public function canSeeBranch(?int $kitchenId): bool
+    {
+        $ids = $this->branchIds();
+        return $ids === null || ($kitchenId !== null && in_array($kitchenId, $ids, true));
+    }
+
+    /** Limit a query on a table with a kitchen_id column to this person's branches. */
+    public function limitToBranches($query, string $column = 'kitchen_id')
+    {
+        $ids = $this->branchIds();
+        return $ids === null ? $query : $query->whereIn($column, $ids);
+    }
+
+    /** Limit a users query to staff who work in at least one of this person's branches. */
+    public function limitStaffToBranches($query)
+    {
+        $ids = $this->branchIds();
+        return $ids === null ? $query : $query->whereHas('kitchens', fn ($k) => $k->whereIn('kitchens.id', $ids));
+    }
+
+    public function canSeeStaff(User $other): bool
+    {
+        $ids = $this->branchIds();
+        return $ids === null || $other->kitchens()->whereIn('kitchens.id', $ids)->exists();
+    }
+
+    /** "All branches" or the names of this person's branches, for page headers. */
+    public function branchScopeLabel(): string
+    {
+        return $this->branchIds() === null ? 'All branches' : ($this->accessibleKitchens()->pluck('name')->join(', ') ?: 'No branch assigned yet');
     }
 
     /** Kitchens this staff member may open the POS and kitchen board for. */
     public function accessibleKitchens(): \Illuminate\Support\Collection
     {
-        return $this->seesAllKitchens() ? Kitchen::orderBy('name')->get() : $this->kitchens()->orderBy('name')->get();
+        return $this->branchIds() === null ? Kitchen::orderBy('name')->get() : Kitchen::whereIn('id', $this->branchIds())->orderBy('name')->get();
     }
 
     public function canUseKitchen(int $kitchenId): bool
     {
-        return $this->seesAllKitchens() || $this->kitchens()->whereKey($kitchenId)->exists();
+        return $this->canSeeBranch($kitchenId);
     }
 
     public function pointsBalance(): int

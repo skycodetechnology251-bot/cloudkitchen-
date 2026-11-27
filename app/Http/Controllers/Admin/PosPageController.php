@@ -42,7 +42,7 @@ class PosPageController extends Controller
     public function receipt(Order $order)
     {
         $u = auth()->user();
-        abort_unless(($u?->hasPermission('pos.use') && $u->canUseKitchen($order->kitchen_id)) || $u?->hasPermission('orders.view'), 403);
+        abort_unless($u && ($u->hasPermission('pos.use') || $u->hasPermission('orders.view')) && $u->canUseKitchen($order->kitchen_id), 403);
         $order->load('items', 'invoice', 'cashier', 'payments');
 
         return view('invoices.receipt', compact('order'));

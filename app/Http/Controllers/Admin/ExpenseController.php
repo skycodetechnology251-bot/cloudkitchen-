@@ -16,19 +16,14 @@ class ExpenseController extends CrudController
 
     protected function query()
     {
-        $q = Expense::latest('spent_on');
-        $u = auth()->user();
-        if ($u->role?->slug !== 'admin' && $u->role?->slug !== 'finance') {
-            $q->whereIn('kitchen_id', $u->kitchens()->pluck('kitchens.id'));
-        }
-        return $q;
+        return auth()->user()->limitToBranches(Expense::latest('spent_on'));
     }
 
     protected function fields(?Model $item): array
     {
         $cats = ['ingredients' => 'Vegetables & groceries', 'supplies' => 'Cooking supplies', 'packaging' => 'Packaging', 'salary' => 'Salary', 'rent' => 'Rent', 'gas' => 'Gas & power', 'delivery' => 'Delivery partners', 'marketing' => 'Marketing & offers', 'other' => 'Other'];
         return [
-            'kitchen_id' => ['label' => 'Kitchen', 'type' => 'select', 'options' => Kitchen::pluck('name', 'id')->all(), 'rules' => 'required|exists:kitchens,id'],
+            'kitchen_id' => ['label' => 'Branch', 'type' => 'select', 'options' => auth()->user()->accessibleKitchens()->pluck('name', 'id')->all(), 'rules' => ['required', 'integer', \Illuminate\Validation\Rule::in(auth()->user()->accessibleKitchens()->pluck('id')->all())]],
             'category' => ['label' => 'Category', 'type' => 'select', 'options' => $cats, 'rules' => 'required|in:'.implode(',', array_keys($cats))],
             'description' => ['label' => 'Description', 'rules' => 'required|string|max:160'],
             'supplier' => ['label' => 'Supplier / payee', 'rules' => 'nullable|string|max:120'],

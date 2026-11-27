@@ -24,9 +24,11 @@ class ReportController extends Controller
     public function index(Request $r)
     {
         [$from, $to] = $this->range($r);
+        $u = $r->user();
         $kitchenId = $r->input('kitchen');
-        $orders = Order::where('payment_status', '!=', 'pending')->whereBetween('created_at', [$from, $to])->when($kitchenId, fn ($q) => $q->where('kitchen_id', $kitchenId));
-        $expenses = Expense::whereBetween('spent_on', [$from->toDateString(), $to->toDateString()])->when($kitchenId, fn ($q) => $q->where('kitchen_id', $kitchenId));
+        abort_unless(! $kitchenId || $u->canSeeBranch((int) $kitchenId), 403, 'You can only see reports for your own branch.');
+        $orders = $u->limitToBranches(Order::query())->where('payment_status', '!=', 'pending')->whereBetween('created_at', [$from, $to])->when($kitchenId, fn ($q) => $q->where('kitchen_id', $kitchenId));
+        $expenses = $u->limitToBranches(Expense::query())->whereBetween('spent_on', [$from->toDateString(), $to->toDateString()])->when($kitchenId, fn ($q) => $q->where('kitchen_id', $kitchenId));
 
         $monthly = [];
         $cursor = $from->copy()->startOfMonth();
@@ -51,22 +53,27 @@ class ReportController extends Controller
             }
         }
         $categories = (clone $expenses)->selectRaw('category, SUM(amount_paise) as total')->groupBy('category')->orderByDesc('total')->pluck('total', 'category');
-        $byKitchen = Kitchen::get()->map(fn ($k) => [
+        $byKitchen = $u->accessibleKitchens()->map(fn ($k) => [
             'name' => $k->name,
             'income' => Order::where('kitchen_id', $k->id)->whereIn('payment_status', ['paid', 'partially_refunded'])->whereBetween('created_at', [$from, $to])->sum('taxable_paise'),
             'expense' => Expense::where('kitchen_id', $k->id)->whereBetween('spent_on', [$from->toDateString(), $to->toDateString()])->sum('amount_paise'),
             'orders' => Order::where('kitchen_id', $k->id)->where('payment_status', 'paid')->whereBetween('created_at', [$from, $to])->count(),
         ]);
-        $liabilities = ['wallets' => Wallet::sum('balance_paise'), 'points' => (int) PointTransaction::where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))->sum('points')];
+        // Customer wallets and points are company-wide, so only head office sees them.
+        $liabilities = $u->branchIds() !== null ? null : ['wallets' => Wallet::sum('balance_paise'), 'points' => (int) PointTransaction::where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))->sum('points')];
 
-        return view('admin.reports', compact('monthly', 'categories', 'byKitchen', 'liabilities', 'from', 'to') + ['kitchens' => Kitchen::pluck('name', 'id'), 'kitchenId' => $kitchenId]);
+        return view('admin.reports', compact('monthly', 'categories', 'byKitchen', 'liabilities', 'from', 'to') + ['kitchens' => $u->accessibleKitchens()->pluck('name', 'id'), 'kitchenId' => $kitchenId, 'scope' => $u->branchScopeLabel()]);
     }
 
     /** Invoice-level GST register for the accountant (GSTR-1 preparation). */
     public function gstCsv(Request $r)
     {
         [$from, $to] = $this->range($r);
-        $rows = Invoice::whereBetween('issued_at', [$from, $to])->orderBy('issued_at')->get();
+        $u = $r->user();
+        $kitchenId = (int) $r->input('kitchen');
+        abort_unless(! $kitchenId || $u->canSeeBranch($kitchenId), 403);
+        $rows = $u->limitToBranches(Invoice::query())->when($kitchenId, fn ($q) => $q->where('kitchen_id', $kitchenId))
+            ->whereBetween('issued_at', [$from, $to])->orderBy('issued_at')->get();
         $out = fopen('php://temp', 'r+');
         fputcsv($out, ['Invoice number', 'Date', 'Kitchen GSTIN', 'Buyer', 'Place of supply', 'Taxable', 'CGST', 'SGST', 'Total']);
         foreach ($rows as $inv) {
@@ -80,6 +87,7 @@ class ReportController extends Controller
 
     public function invoice(Invoice $invoice)
     {
+        abort_unless(auth()->user()->canSeeBranch($invoice->kitchen_id), 403, 'This invoice belongs to another branch.');
         return view('invoices.show', compact('invoice'));
     }
 }

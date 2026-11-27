@@ -25,7 +25,8 @@ class AccessSeeder extends Seeder
         ['customers & health', 'cust.contact', 'View customer contact details', false],
         ['customers & health', 'health.view', 'View consented health profiles', true],
         ['customers & health', 'health.plans', 'Create & send diet plans', true],
-        ['zones', 'zones.edit', 'Create & edit zones and kitchens', false],
+        ['branches', 'branches.all', 'See & manage every branch (head office)', true],
+        ['zones', 'zones.edit', 'Create & edit branches and zones', false],
         ['zones', 'zones.golive', 'Approve zone go-live', false],
         ['marketing', 'mkt.banners', 'Manage banners, popups & offers', false],
         ['staff', 'staff.manage', 'Invite & manage staff', true],
@@ -39,7 +40,7 @@ class AccessSeeder extends Seeder
     public const ROLES = [
         'admin' => ['Admin', 'Full control of the platform.', ['*']],
         'ops' => ['Operations manager', 'Runs daily service, approves go-live, handles escalations.', ['pos.use', 'pos.discount', 'pos.void', 'orders.view', 'orders.refund', 'menu.publish', 'kitchen.board', 'kitchen.pause', 'delivery.assign', 'cust.contact', 'zones.edit', 'zones.golive', 'mkt.banners', 'staff.manage', 'fin.reports', 'expenses.edit']],
-        'kitchen_manager' => ['Kitchen manager', 'Production, stock, expenses and dish availability for assigned kitchens.', ['pos.use', 'pos.discount', 'orders.view', 'menu.edit', 'menu.publish', 'kitchen.board', 'kitchen.pause', 'delivery.assign', 'expenses.edit']],
+        'kitchen_manager' => ['Kitchen manager', 'Production, stock, expenses and dish availability for their branch.', ['pos.use', 'pos.discount', 'orders.view', 'menu.edit', 'menu.publish', 'kitchen.board', 'kitchen.pause', 'delivery.assign', 'expenses.edit']],
         'kitchen_staff' => ['Kitchen staff', 'Cooks and packers: production board and counter POS.', ['kitchen.board', 'pos.use']],
         'cashier' => ['POS cashier', 'Counter and phone orders, invoices.', ['pos.use', 'pos.discount', 'orders.view']],
         'support' => ['Support agent', 'Customer tickets and approved refunds.', ['pos.use', 'orders.view', 'orders.refund', 'cust.contact']],

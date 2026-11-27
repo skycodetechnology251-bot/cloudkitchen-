@@ -170,3 +170,10 @@ Admin → Branches lists every branch with today's orders and sales. **+ New bra
 4. Team: the staff and riders who work there. They get that branch's POS and kitchen board.
 
 A customer is served by the nearest open branch whose zone covers their address and that is within its delivery distance. Zones can be shared by several branches, and overlapping zones are fine.
+
+## Who sees which branch
+
+- **Head office (Admin)** sees and manages every branch: all orders, reports, income and expenses, payroll, staff, zones, and the company-wide customer wallet and points totals. Filters let you look at one branch or all together.
+- **Everyone else** sees only the branches they're assigned to (Branches → Team at this branch, or Staff → Branches they work in). That covers the dashboard, orders, invoices, reports and GST export, purchases and expenses, daily menu, POS, kitchen board, payroll, staff and zones. Opening another branch's page by its link is refused.
+- A branch manager can't add branches, change the salary set for a role (it applies company-wide), or give anyone a head-office role.
+- To let another role see every branch (for example Finance or Operations manager), tick **See & manage every branch (head office)** for that role in Admin → Roles & permissions.

@@ -12,7 +12,7 @@
       <h1>Branches</h1>
       <p>Each branch has its own address, delivery zones, team, daily menu, POS and invoice series. Customers are served by the nearest open branch whose zone covers their address.</p>
     </div>
-    <a class="btn" href="{{ route('admin.branches.create') }}" style="background:#fff;color:#0F5C4D">+ New branch</a>
+    @if($all)<a class="btn" href="{{ route('admin.branches.create') }}" style="background:#fff;color:#0F5C4D">+ New branch</a>@else<span class="chip" style="background:rgba(255,255,255,.22);color:#fff">Your branch{{ $branches->count() > 1 ? 'es' : '' }} only</span>@endif
   </div>
 </div>
 
@@ -26,8 +26,8 @@
 @if($branches->isEmpty())
   <div class="card" style="text-align:center;padding:40px">
     <h2 style="font-size:20px">No branches yet</h2>
-    <p class="muted">Create your first branch, place it on the map and give it a delivery zone.</p>
-    <a class="btn" href="{{ route('admin.branches.create') }}">+ New branch</a>
+    @if($all)<p class="muted">Create your first branch, place it on the map and give it a delivery zone.</p>
+    <a class="btn" href="{{ route('admin.branches.create') }}">+ New branch</a>@else<p class="muted">You're not assigned to a branch yet. Ask head office to add you to one.</p>@endif
   </div>
 @else
 <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr))">
