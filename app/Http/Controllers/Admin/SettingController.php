@@ -13,8 +13,8 @@ class SettingController extends Controller
     public const GROUPS = [
         'razorpay' => ['label' => 'Razorpay payments', 'fields' => ['key_id' => ['Key ID', false], 'key_secret' => ['Key secret', true], 'webhook_secret' => ['Webhook secret', true]],
             'note' => 'Webhook URL: /api/v1/webhooks/razorpay. Events: payment.captured, payment.failed, refund.processed.'],
-        'google' => ['label' => 'Google sign-in', 'fields' => ['android_client_id' => ['Android client ID', false], 'ios_client_id' => ['iPhone client ID', false], 'web_client_id' => ['Web client ID', false], 'client_ids' => ['Other allowed client IDs (optional, comma separated)', false]],
-            'note' => 'Used by the website and both apps (written to mobile/app-config.json). Customers still verify a mobile number after Google sign-up.'],
+        'google' => ['label' => 'Google sign-in & Maps', 'fields' => ['maps_api_key' => ['Google Maps API key (browser key, for the zone map in admin)', false], 'android_client_id' => ['Android client ID', false], 'ios_client_id' => ['iPhone client ID', false], 'web_client_id' => ['Web client ID', false], 'client_ids' => ['Other allowed client IDs (optional, comma separated)', false]],
+            'note' => 'Maps key: in Google Cloud enable "Maps JavaScript API" and "Geocoding API", and restrict the key to your website address. Without a key the zone map uses OpenStreetMap. Sign-in IDs are used by the website and both apps (written to mobile/app-config.json). Customers still verify a mobile number after Google sign-up.'],
         'sms' => ['label' => 'SMS & OTP', 'fields' => ['driver' => ['Driver (log or http)', false], 'endpoint' => ['Provider API endpoint', false], 'api_key' => ['API key', true], 'sender_id' => ['DLT sender ID', false], 'otp_template_id' => ['DLT OTP template ID', false]],
             'note' => 'Use "log" during setup: codes are written to storage/logs/laravel.log.'],
         'push' => ['label' => 'Push notifications', 'fields' => ['enabled' => ['Enabled (1 or 0)', false], 'expo_access_token' => ['Expo access token (optional)', true]],

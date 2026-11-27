@@ -24,9 +24,9 @@ class DemoSeeder extends Seeder
     public function run(): void
     {
         self::$password ??= 'Demo-'.\Illuminate\Support\Str::password(10, symbols: false);
-        $zone = Zone::firstOrCreate(['slug' => 'adyar'], ['name' => 'Adyar', 'status' => 'live', 'went_live_at' => now(),
+        $zone = Zone::firstOrCreate(['slug' => 'adyar'], ['name' => 'Adyar', 'status' => 'live', 'went_live_at' => now(), 'state' => 'Tamil Nadu', 'city' => 'Chennai', 'pincode' => '600020', 'address' => 'Adyar, Chennai', 'center_lat' => 13.0040, 'center_lng' => 80.2580,
             'polygon' => [[13.0175, 80.2420], [13.0180, 80.2720], [12.9925, 80.2745], [12.9890, 80.2440]]]);
-        Zone::firstOrCreate(['slug' => 'besant-nagar'], ['name' => 'Besant Nagar', 'status' => 'testing',
+        Zone::firstOrCreate(['slug' => 'besant-nagar'], ['name' => 'Besant Nagar', 'status' => 'testing', 'state' => 'Tamil Nadu', 'city' => 'Chennai', 'pincode' => '600090', 'address' => 'Besant Nagar, Chennai', 'center_lat' => 12.9990, 'center_lng' => 80.2700,
             'polygon' => [[13.0050, 80.2620], [13.0060, 80.2760], [12.9930, 80.2770], [12.9925, 80.2640]]]);
 
         $kitchen = Kitchen::firstOrCreate(['code' => 'ADY'], ['name' => 'Adyar kitchen', 'legal_name' => '[LEGAL NAME]', 'address' => '[KITCHEN ADDRESS], Adyar, Chennai 600020',

@@ -7,9 +7,10 @@
   <div class="grid g2" style="gap:0 20px">
   @foreach($fields as $name => $f)
     @continue(isset($f['perm']) && ! auth()->user()->hasPermission($f['perm']))
+    @continue(($f['type'] ?? '') === 'embedded')
     @php($type = $f['type'] ?? 'text')
     @php($val = old($name, $f['value'] ?? data_get($item, $f['column'] ?? $name)))
-    <div class="field" style="{{ in_array($type, ['textarea','json','map','banner_designer','multiselect']) ? 'grid-column:1/-1' : '' }}">
+    <div class="field" style="{{ in_array($type, ['textarea','json','map','zone_location','banner_designer','multiselect']) ? 'grid-column:1/-1' : '' }}">
       @if($type === 'checkbox')
         <label class="row" style="font-weight:700"><input type="checkbox" name="{{ $name }}" value="1" @checked($val ?? ($item->exists ? false : true))> {{ $f['label'] }}</label>
       @else
@@ -27,6 +28,7 @@
           @case('multiselect')
             <div class="row">@foreach($f['options'] as $k => $l)<label class="chip grey" style="cursor:pointer;font-size:13px;padding:8px 12px"><input type="checkbox" name="{{ $name }}[]" value="{{ $k }}" @checked(in_array($k, (array) $val))> {{ $l }}</label>@endforeach</div>@break
           @case('map')@include('admin.partials.map', ['name' => $name, 'val' => $val])@break
+          @case('zone_location')@include('admin.partials.zone-location', ['name' => $name, 'val' => $val, 'item' => $item])@break
           @case('banner_designer')@include('admin.partials.banner-designer', ['name' => $name, 'val' => $val, 'item' => $item])@break
           @default<input id="f_{{ $name }}" type="text" name="{{ $name }}" value="{{ is_array($val) ? implode(',', $val) : $val }}">
         @endswitch

@@ -13,13 +13,27 @@ class ZoneController extends CrudController
     protected string $model = Zone::class;
     protected string $title = 'Zones';
     protected string $route = 'admin.zones';
-    protected array $columns = ['name' => 'Zone', 'status' => 'Status', 'version' => 'Boundary version'];
+    protected array $columns = ['name' => 'Zone', 'city' => 'City', 'state' => 'State', 'status' => 'Status', 'version' => 'Boundary version'];
 
     protected function fields(?Model $item): array
     {
         return [
-            'name' => ['label' => 'Zone name', 'rules' => 'required|string|max:60'],
-            'polygon' => ['label' => 'Boundary', 'type' => 'map', 'rules' => 'required|json', 'help' => 'Click on the map to draw the boundary. Stored as [[lat,lng],...].'],
+            'name' => ['label' => 'Zone name (area customers know, e.g. Adyar)', 'rules' => 'required|string|max:60'],
+            // One block on the form: country / state / city, full address, current location and the Google map.
+            'polygon' => ['label' => 'Location & delivery boundary', 'type' => 'zone_location', 'rules' => ['required', 'json', function ($a, $v, $fail) {
+                $p = json_decode((string) $v, true);
+                if (! is_array($p) || count($p) < 3) {
+                    $fail('Draw the delivery boundary: at least 3 points on the map, or use "Circle around the centre".');
+                }
+            }]],
+            'country' => ['type' => 'embedded', 'rules' => 'required|string|max:80'],
+            'country_code' => ['type' => 'embedded', 'rules' => 'required|alpha|size:2'],
+            'state' => ['type' => 'embedded', 'rules' => 'required|string|max:80'],
+            'city' => ['type' => 'embedded', 'rules' => 'required|string|max:80'],
+            'address' => ['type' => 'embedded', 'rules' => 'nullable|string|max:255'],
+            'pincode' => ['type' => 'embedded', 'rules' => ['nullable', 'regex:/^[A-Za-z0-9 -]{3,12}$/']],
+            'center_lat' => ['type' => 'embedded', 'rules' => 'nullable|numeric|between:-90,90'],
+            'center_lng' => ['type' => 'embedded', 'rules' => 'nullable|numeric|between:-180,180'],
             'status' => ['label' => 'Status', 'type' => 'select', 'options' => ['draft' => 'Draft', 'testing' => 'Testing', 'paused' => 'Paused', 'closed' => 'Closed'], 'rules' => 'required|in:draft,testing,paused,closed', 'help' => 'Going live needs approval: use "Approve go-live" on the list.'],
             'seo_title' => ['label' => 'Area page title (SEO)', 'rules' => 'nullable|string|max:120'],
             'seo_description' => ['label' => 'Area page description (SEO)', 'type' => 'textarea', 'rules' => 'nullable|string|max:300'],
@@ -29,6 +43,12 @@ class ZoneController extends CrudController
     protected function filled(Model $item, array $data, Request $r): void
     {
         $data['polygon'] = is_string($data['polygon']) ? json_decode($data['polygon'], true) : $data['polygon'];
+        $data['country_code'] = strtoupper($data['country_code']);
+        // No centre given: use the middle of the boundary.
+        if (empty($data['center_lat']) && count($data['polygon'])) {
+            $data['center_lat'] = round(collect($data['polygon'])->avg(0), 7);
+            $data['center_lng'] = round(collect($data['polygon'])->avg(1), 7);
+        }
         if ($item->exists && $item->polygon != $data['polygon']) {
             $item->version++;
         }
