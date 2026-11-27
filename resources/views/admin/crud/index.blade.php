@@ -13,10 +13,12 @@
       @foreach($columns as $key => $label)
         @php($v = data_get($item, $key))
         <td>
-          @if(is_bool($v) || in_array($key, ['is_active','is_open']))<span class="chip {{ $v ? '' : 'grey' }}">{{ $v ? 'Yes' : 'No' }}</span>
-          @elseif(str_ends_with($key, '_paise'))₹{{ number_format(($v ?? 0)/100, 2) }}
+          @if($loop->first)<b>{{ is_array($v) ? implode(', ', $v) : $v }}</b>
+          @elseif(is_bool($v) || in_array($key, ['is_active','is_open']))<span class="chip {{ $v ? 'green' : 'grey' }}">{{ $v ? '● Yes' : 'No' }}</span>
+          @elseif(str_ends_with($key, '_paise'))<b style="color:var(--acc-ink)">₹{{ number_format(($v ?? 0)/100, 2) }}</b>
+          @elseif(in_array($key, ['diet', 'category', 'role.name']))<span class="chip {{ ['veg' => 'green', 'nonveg' => 'coral', 'egg' => 'amber'][$v] ?? 'blue' }}">{{ is_string($v) ? ucfirst(str_replace('_', ' ', $v)) : $v }}</span>
           @elseif($v instanceof \Carbon\CarbonInterface){{ $v->format('d M Y') }}
-          @elseif($key === 'status')<span class="chip {{ $v === 'live' ? '' : 'grey' }}">{{ ucfirst($v) }}</span>
+          @elseif($key === 'status')<span class="chip {{ ['live' => 'green', 'testing' => 'amber', 'draft' => 'grey', 'paused' => 'coral', 'closed' => 'grey', 'active' => 'green', 'scheduled' => 'blue', 'expired' => 'grey'][$v] ?? 'purple' }}">{{ ucfirst($v) }}</span>
           @else{{ is_array($v) ? implode(', ', $v) : $v }}@endif
         </td>
       @endforeach

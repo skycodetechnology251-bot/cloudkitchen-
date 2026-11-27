@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'version' => '1.7.0',
+    'version' => '1.8.0',
     'brand' => env('APP_BRAND', 'Daily Table'),
 
     // Mobile apps (mobile/customer, mobile/rider). Defaults; Admin → Integrations → Mobile apps

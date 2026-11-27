@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="{{ asset('css/dt.css') }}">
 @stack('head')
 </head>
-<body>
+<body class="acc-{{ \App\Support\Accent::current() }}">
 @php($u = auth()->user())
 @php($myKitchens = $u->accessibleKitchens())
 @php($posKitchen = request()->route('kitchen') instanceof \App\Models\Kitchen && request()->routeIs('admin.pos') ? request()->route('kitchen') : null)

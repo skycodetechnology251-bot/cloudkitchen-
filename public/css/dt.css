@@ -122,3 +122,90 @@ textarea{min-height:90px}input[type=checkbox]{width:20px;min-height:20px;accent-
 .pagehead::after{content:"";position:absolute;right:-60px;bottom:-80px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.1)}
 .pagehead h1{font-size:28px;color:#fff}.pagehead p{color:rgba(255,255,255,.85);margin:6px 0 0;max-width:640px}
 @media (prefers-reduced-motion:reduce){.kpi,.tile,.side a{transition:none}.kpi:hover,.tile:hover{transform:none}}
+/* ---------- Colourful pages everywhere (v1.8): each section has its own accent ---------- */
+body{--acc1:#0F5C4D;--acc2:#2554B8;--acc-soft:#E8F3EF;--acc-ink:#0F5C4D}
+.acc-teal{--acc1:#0F5C4D;--acc2:#1FA67A;--acc-soft:#E3F4EE;--acc-ink:#0F5C4D}
+.acc-blue{--acc1:#1F4FC2;--acc2:#5B8CF5;--acc-soft:#EAF0FF;--acc-ink:#1D3F8F}
+.acc-amber{--acc1:#C27407;--acc2:#F2B33D;--acc-soft:#FFF4DC;--acc-ink:#7A4A02}
+.acc-coral{--acc1:#C9472A;--acc2:#F48A5E;--acc-soft:#FFEDE6;--acc-ink:#8A2E17}
+.acc-pink{--acc1:#B8285F;--acc2:#EE6AA0;--acc-soft:#FDE9F1;--acc-ink:#8A1C47}
+.acc-green{--acc1:#167D49;--acc2:#3CC184;--acc-soft:#E2F6EA;--acc-ink:#0E5A33}
+.acc-purple{--acc1:#5B30C0;--acc2:#9F70F5;--acc-soft:#F0EAFE;--acc-ink:#46229A}
+.acc-sky{--acc1:#0A7499;--acc2:#36B8DE;--acc-soft:#E2F5FB;--acc-ink:#075873}
+.acc-indigo{--acc1:#3446C2;--acc2:#7484F4;--acc-soft:#ECEEFE;--acc-ink:#27359A}
+.acc-slate{--acc1:#1F5266;--acc2:#3F93AF;--acc-soft:#E5F1F5;--acc-ink:#173F4F}
+.main{background:radial-gradient(900px 320px at 100% 0,color-mix(in srgb,var(--acc2) 12%,transparent),transparent 70%),radial-gradient(700px 300px at 0 100%,color-mix(in srgb,var(--acc1) 6%,transparent),transparent 70%),var(--bg)}
+.topbar-title{display:flex;align-items:center;gap:10px}
+.topbar-title::before{content:"";width:12px;height:12px;border-radius:4px;background:linear-gradient(135deg,var(--acc2),var(--acc1))}
+/* page title rows become a gradient banner */
+.main>.row.between:has(>h1),.main>.row.between:has(>div>h1){background:linear-gradient(120deg,var(--acc1) 0%,var(--acc2) 100%);border-radius:24px;padding:20px 22px;color:#fff;position:relative;overflow:hidden;box-shadow:0 20px 40px -30px var(--acc1);margin-bottom:18px!important}
+.main>.row.between:has(>h1)::after,.main>.row.between:has(>div>h1)::after{content:"";position:absolute;right:-50px;top:-70px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}
+.main>.row.between:has(>h1)>*,.main>.row.between:has(>div>h1)>*{position:relative;z-index:1}
+.main>.row.between h1{color:#fff;font-size:28px!important}
+.main>.row.between:has(>h1) .muted,.main>.row.between:has(>div>h1) .muted{color:rgba(255,255,255,.85)}
+.main>.row.between:has(>h1) input,.main>.row.between:has(>h1) select{background:rgba(255,255,255,.96);border-color:transparent;border-radius:999px}
+.main>.row.between:has(>h1) .btn:not(.ghost),.main>.row.between:has(>div>h1) .btn:not(.ghost){background:#fff;color:var(--acc-ink)}
+.main>.row.between:has(>h1) .btn.ghost,.main>.row.between:has(>div>h1) .btn.ghost{background:rgba(255,255,255,.18);color:#fff;border-color:transparent}
+/* cards, tables, buttons, fields */
+.main .card{border-color:color-mix(in srgb,var(--acc1) 10%,var(--line))}
+.main .card.tablebox,.main form.card:not([style*="padding:0"]),.main section.card:not([style*="border-top"]):not([style*="padding:0"]){border-top:4px solid var(--acc2)}
+.main .card table th,.main .tablebox table th{background:var(--acc-soft);color:var(--acc-ink);font-size:12px;text-transform:uppercase;letter-spacing:.05em;border-bottom:0}
+.main table thead th:first-child{border-radius:12px 0 0 12px}.main table thead th:last-child{border-radius:0 12px 12px 0}
+.main tbody tr:nth-child(even) td{background:#FAFCFC}
+.main .card table tbody tr:hover td{background:var(--acc-soft)}
+.main .card h2{color:var(--ink)}
+.main .btn:not(.ghost):not(.danger):not(.mint):not(.pos-btn){background:linear-gradient(135deg,var(--acc2),var(--acc1))}
+.main .btn:not(.ghost):not(.danger):not(.mint):not(.pos-btn):hover{box-shadow:0 10px 22px -12px var(--acc1)}
+.main .btn.ghost{color:var(--acc-ink);border-color:color-mix(in srgb,var(--acc1) 30%,var(--line))}
+.main .btn.ghost:hover{background:var(--acc-soft)}
+.main input:focus,.main select:focus,.main textarea:focus{outline:none;border-color:var(--acc1);box-shadow:0 0 0 4px var(--acc-soft)}
+.main input[type=checkbox],.main input[type=radio]{accent-color:var(--acc1)}
+.main .field label{color:var(--acc-ink)}
+.flash{border-left:5px solid var(--acc1)}
+/* dashboard pieces */
+.dash-hero{border-radius:28px;padding:24px 26px;color:#fff;background:linear-gradient(115deg,#0F5C4D 0%,#1F4FC2 45%,#7A3FF2 80%,#EE6AA0 120%);position:relative;overflow:hidden;margin-bottom:18px;box-shadow:0 26px 50px -34px #1F4FC2}
+.dash-hero::before{content:"";position:absolute;right:-80px;top:-120px;width:360px;height:360px;border-radius:50%;background:rgba(255,255,255,.1)}
+.dash-hero::after{content:"";position:absolute;right:140px;bottom:-140px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.07)}
+.dash-hero>*{position:relative;z-index:1}
+.dash-hero h1{color:#fff;font-size:30px;margin:0}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.hero-stat{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);border-radius:16px;padding:10px 14px;min-width:130px;backdrop-filter:blur(4px)}
+.hero-stat b{display:block;font-size:20px}.hero-stat span{font-size:12px;opacity:.85}
+.delta{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:800;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.22);margin-top:6px}
+.panel{background:#fff;border-radius:22px;padding:18px;border:1px solid var(--line);box-shadow:0 14px 34px -28px rgba(18,48,42,.4)}
+.panel h2{font-size:17px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
+.panel h2 .dot{width:10px;height:10px;border-radius:3px}
+.panel .sub{font-size:12px;color:var(--muted);margin-bottom:12px}
+.bars{display:flex;align-items:flex-end;gap:10px;height:200px;padding-top:8px}
+.bars .b{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.bars .col{width:100%;max-width:46px;border-radius:12px 12px 6px 6px;position:relative;min-height:4px;transition:height .6s}
+.bars .col span{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:800;color:var(--ink);white-space:nowrap}
+.bars .lbl{font-size:12px;font-weight:700;color:var(--muted)}
+.bars .b.today .lbl{color:var(--ink)}
+.donut{width:150px;height:150px;border-radius:50%;position:relative;flex:0 0 150px}
+.donut::after{content:"";position:absolute;inset:22px;border-radius:50%;background:#fff}
+.donut .mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1;font-weight:800}
+.donut .mid b{font-size:28px}.donut .mid span{font-size:12px;color:var(--muted)}
+.legend{display:grid;gap:8px;font-size:13px;flex:1}
+.legend div{display:flex;align-items:center;gap:8px}.legend i{width:12px;height:12px;border-radius:4px;flex:0 0 12px}
+.legend b{margin-left:auto}
+.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.pipe .st{border-radius:18px;padding:14px;color:#fff;position:relative;overflow:hidden}
+.pipe .st b{font-size:28px;display:block}.pipe .st span{font-size:12px;font-weight:700;opacity:.92}
+.pipe .st svg{position:absolute;right:10px;top:10px;width:22px;height:22px;opacity:.55}
+.rank{display:grid;gap:10px}
+.rank .r{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center}
+.rank .n{width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px}
+.rank .track{height:8px;border-radius:99px;background:#EEF2F1;margin-top:5px;overflow:hidden}.rank .track i{display:block;height:100%;border-radius:99px}
+.mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stock{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#FFF6E6}
+.stock.out{background:#FFEDE6}
+.ord{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;padding:10px 4px;border-bottom:1px dashed var(--line)}
+.ord:last-child{border-bottom:0}
+@media (max-width:900px){.pipe{grid-template-columns:repeat(2,1fr)}.bars{gap:6px}}
+@media (prefers-reduced-motion:reduce){.bars .col{transition:none}}
+/* banner buttons stay white; page titles written as a bare h1 get the banner too */
+.main>.row.between:has(>h1) .btn:not(.ghost),.main>.row.between:has(>div>h1) .btn:not(.ghost){background:#fff!important;color:var(--acc-ink)!important;box-shadow:none}
+.main>.row.between:has(>h1) .btn.ghost,.main>.row.between:has(>div>h1) .btn.ghost{background:rgba(255,255,255,.2)!important;color:#fff!important}
+.main>h1{background:linear-gradient(120deg,var(--acc1),var(--acc2));color:#fff;border-radius:24px;padding:22px 24px;font-size:28px!important;margin-bottom:18px!important;box-shadow:0 20px 40px -30px var(--acc1);position:relative;overflow:hidden}
+.main>h1::after{content:"";position:absolute;right:-50px;top:-70px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.12)}
