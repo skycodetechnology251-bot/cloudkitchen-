@@ -104,6 +104,12 @@ Remove the demo staff before going live.
 - There are ten roles. Admin → Roles lets you edit the permissions of each role.
 - Every staff role can use the counter POS. A **POS** button sits in the top bar of every staff page.
 - Staff bill for the kitchens they work in, set in Admin → Staff → Kitchens they work in. Admin and operations managers can bill for every kitchen and switch kitchens from the POS button's menu.
+
+**Salaries and payroll** (Admin → Salaries & payroll; admin and finance only)
+
+- **Salary by role:** set how each role is paid: monthly, per day, per hour or per delivery, plus an optional extra per delivery for riders.
+- **Own amount:** in Admin → Staff, anyone can have their own salary and joining date. Leave it blank to use the role's salary.
+- **Payroll:** pick a month and pay each person. Add a bonus or deduction, enter days or hours for daily and hourly staff; riders' delivery pay counts their completed deliveries. Each payment is recorded as a salary expense, so it appears in Reports, and has a printable payslip. "Undo" removes a payment entered by mistake.
 - Health details are visible only to dietitians and doctors.
 
 **Not in this version:** the dietitian dashboard and AI-drafted diet plans from the designs. They are planned for the next phase. Their roles and the health-consent records are already in place.

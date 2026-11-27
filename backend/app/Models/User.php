@@ -23,6 +23,7 @@ class User extends Authenticatable
         return [
             'phone_verified_at' => 'datetime',
             'email_verified_at' => 'datetime',
+            'joined_on' => 'date',
             'last_seen_at' => 'datetime',
             'date_of_birth' => 'date',
             'password' => 'hashed',
@@ -55,6 +56,31 @@ class User extends Authenticatable
         }
         return $this->role->permissions->contains('slug', $slug);
     }
+
+    /**
+     * Salary that applies to this person: their own amount if set, otherwise their role's.
+     * @return array{type: string, paise: int, per_delivery_paise: int, own: bool}
+     */
+    public function salaryPlan(): array
+    {
+        $own = $this->salary_paise !== null || $this->per_delivery_paise !== null || $this->salary_type !== null;
+
+        return [
+            'type' => $this->salary_type ?? $this->role?->salary_type ?? 'monthly',
+            'paise' => (int) ($this->salary_paise ?? $this->role?->salary_paise ?? 0),
+            'per_delivery_paise' => (int) ($this->per_delivery_paise ?? $this->role?->per_delivery_paise ?? 0),
+            'own' => $own,
+        ];
+    }
+
+    public function getSalaryLabelAttribute(): string
+    {
+        $p = $this->salaryPlan();
+
+        return Role::salaryText($p['type'], $p['paise'], $p['per_delivery_paise']).($p['own'] ? '' : ' (role)');
+    }
+
+    public function salaryPayments() { return $this->hasMany(SalaryPayment::class); }
 
     /** Admin and operations managers work across every kitchen; other staff only in kitchens assigned to them. */
     public function seesAllKitchens(): bool

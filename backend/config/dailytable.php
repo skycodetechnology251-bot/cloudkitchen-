@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'version' => '1.3.0',
+    'version' => '1.4.0',
     'brand' => env('APP_BRAND', 'Daily Table'),
 
     // Installation (browser wizard at /install, or php artisan dailytable:install)

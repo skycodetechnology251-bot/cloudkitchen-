@@ -26,7 +26,10 @@
   <nav aria-label="Main" style="display: flex; flex-wrap: wrap; gap: 28px; font-size: 15px; font-weight: 600">
     <a href="{{ route('home') }}#idea">The idea</a><a href="{{ route('home') }}#how">How it works</a><a href="{{ route('home') }}#app">The app</a><a href="{{ route('home') }}#kitchens">Our kitchens</a><a href="{{ route('home') }}#areas">Areas</a><a href="{{ route('home') }}#faq">FAQ</a>
   </nav>
-  <a href="{{ $seo['android_url'] ?? '#download' }}" style="height: 44px; padding: 0 20px; border-radius: 999px; background: #0F5C4D; color: #FFFFFF; display: flex; align-items: center; font-weight: 700; font-size: 14px">Get the app</a>
+  <div style="display: flex; align-items: center; gap: 10px">
+    <a href="{{ route('login') }}" style="height: 44px; padding: 0 18px; border-radius: 999px; border: 1.5px solid #CFDDD8; background: rgba(255,255,255,.7); display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Log in</a>
+    <a href="{{ $seo['android_url'] ?? '#download' }}" style="height: 44px; padding: 0 20px; border-radius: 999px; background: #0F5C4D; color: #FFFFFF; display: flex; align-items: center; font-weight: 700; font-size: 14px">Get the app</a>
+  </div>
 </header>
 <main>@yield('content')</main>
 <footer class="site-foot" style="border-top: 1px solid #DCE7E2; padding: 28px 24px; font-family: 'Manrope', sans-serif">

@@ -27,6 +27,7 @@
       ['admin.expenses.index', 'Purchases & expenses', 'expenses.edit'],
       ['admin.reports', 'Reports', 'fin.reports'],
       ['admin.staff.index', 'Staff', 'staff.manage'],
+      ['admin.salaries', 'Salaries & payroll', 'staff.salary'],
       ['admin.roles.index', 'Roles & permissions', 'staff.roles'],
       ['admin.settings.index', 'Integrations', 'settings.manage'],
       ['admin.system', 'System & updates', 'settings.manage'],
