@@ -12,3 +12,6 @@ mobile/*/ios/
 dist/
 *.log
 .DS_Store
+
+# Branding uploads (kept on the server, not in git)
+/public/uploads/

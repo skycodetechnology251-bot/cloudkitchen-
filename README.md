@@ -177,3 +177,13 @@ A customer is served by the nearest open branch whose zone covers their address 
 - **Everyone else** sees only the branches they're assigned to (Branches → Team at this branch, or Staff → Branches they work in). That covers the dashboard, orders, invoices, reports and GST export, purchases and expenses, daily menu, POS, kitchen board, payroll, staff and zones. Opening another branch's page by its link is refused.
 - A branch manager can't add branches, change the salary set for a role (it applies company-wide), or give anyone a head-office role.
 - To let another role see every branch (for example Finance or Operations manager), tick **See & manage every branch (head office)** for that role in Admin → Roles & permissions.
+
+## Branding (logo, name and fonts)
+
+Admin → Branding (needs "Manage integrations & keys"):
+
+- **Logo:** upload a PNG, JPG or WEBP (up to 2 MB; a wide logo with a transparent background looks best). It appears in the website header and footer, the admin sidebar, the staff login, invoices and payslips, and as the browser tab icon. Untick "Show the name next to the logo" if the logo already contains your name.
+- **Business name:** used across the website, admin, invoices and the apps' config.
+- **Fonts:** pick a heading font and a text font from 22 Google Fonts. The live preview shows them before you save.
+
+Uploaded logos are stored in `public/uploads/brand/` (keep this folder when you move servers). The apps receive the name and logo address in `/api/v1/app-config`; the app icon itself changes only with a new APK build.

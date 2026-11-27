@@ -41,6 +41,7 @@ class MobileConfig
         return [
             'api_url' => rtrim((string) config('app.url'), '/'),
             'brand' => $brand,
+            'logo_url' => \App\Support\Brand::logoAbsoluteUrl(),
             'version' => $s('version', $m['version']),
             'customer' => [
                 'name' => $s('customer_name', $m['customer']['name']),

@@ -24,6 +24,8 @@
     ['Do I need a subscription?', 'No. Order single meals whenever you like. Meal plans come later and will always be optional.', '#F2711C'],
     ['Can I cancel an order?', 'Yes, free until the cut-off shown at checkout. After cooking starts, our support team will help.', '#E0433B'],
     ['How does the wallet work?', 'Top up any amount from ₹100 by UPI or card. Each lunch is paid from the wallet first; if it runs short, the rest goes to UPI or card. The app shows how many lunches your balance covers and reminds you before it runs low. Refunds can come back to the wallet instantly.', '#F4B400'],
+    ['Who is the dietitian and what do they do?', 'The dietitian on our team reviews every recipe before it is marked “Dietitian-reviewed”: ingredients, portion, calories, protein, carbs, fat, fibre, salt and allergens. They also mark which dishes suit needs like diabetes or high blood pressure. If a recipe changes, it is reviewed again.', '#8CC63F'],
+    ['Will the dietitian give me personal medical advice?', 'No. The dietitian reviews our recipes and the suggestions in the app so you can choose balanced meals. For any health condition, please follow your own doctor\'s advice.', '#1F8A4C'],
     ['Do I get a GST invoice?', 'Yes. Every paid order gets a proper GST invoice in the app, and the counter gives a printed receipt.', '#9C2A6B'],
     ['Is there an iPhone app?', $seo['ios_url'] ? 'Yes. Daily Table is on the App Store and Google Play.' : "We're starting with Android. iPhone is planned for a later release.", '#8CC63F'],
   ];
@@ -109,6 +111,35 @@
           <div><i style="background:var(--leaf)"></i><span><b>Vegetables</b><small>poriyal, kootu and seasonal greens</small></span></div>
           <div><i style="background:#7FB8E8"></i><span><b>Dairy</b><small>curd and buttermilk to finish</small></span></div>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{-- DIETITIAN --}}
+<section class="s-sec" id="dietitian" style="background:linear-gradient(180deg,#F0F8E2 0%,#FFF9EF 100%)">
+  <div class="s-wrap">
+    <div class="diet">
+      <div>
+        <span class="s-kicker k-lime">🩺 Our dietitian</span>
+        <h2 class="s-h2">A dietitian checks every dish before it reaches you</h2>
+        <p class="s-lead">Before a dish is marked <span class="badge-rev">✓ Dietitian-reviewed</span>, our dietitian goes through its recipe and nutrition label line by line.</p>
+        <div class="checklist" aria-label="What the dietitian checks">
+          <span><b>✓</b>Ingredients</span><span><b>✓</b>Portion size</span><span><b>✓</b>Calories</span>
+          <span><b>✓</b>Protein, carbs &amp; fat</span><span><b>✓</b>Fibre &amp; salt level</span><span><b>✓</b>Allergens</span>
+        </div>
+        <p class="s-lead" style="font-size:15px">If the kitchen changes a recipe, the mark comes off until the dietitian checks it again — so the label always matches what's on your plate.</p>
+        <h3 style="font-size:22px;margin-top:22px!important">Dishes reviewed as suitable for</h3>
+        <div class="conds">
+          <span style="border-color:#F4B400">Diabetes</span><span style="border-color:#E0433B">High blood pressure</span><span style="border-color:#F2711C">High cholesterol</span>
+          <span style="border-color:#9C2A6B">Thyroid</span><span style="border-color:#C04A8C">PCOS</span><span style="border-color:#E0433B">Heart care</span><span style="border-color:#1F8A4C">Weight management</span>
+        </div>
+      </div>
+      <div class="diet-flow">
+        <div class="fs"><i style="background:linear-gradient(135deg,#FFC93C,var(--carrot))">1</i><div><h3>Tell us what you need — only if you want to</h3><p>In the app you can add allergies, vegetarian preference and health needs. Health details are off by default and used only after you give consent.</p></div></div>
+        <div class="fs"><i style="background:linear-gradient(135deg,var(--lime),var(--leaf))">2</i><div><h3>The menu highlights what fits you</h3><p>Dishes the dietitian reviewed as suitable for <b>all</b> your health needs are marked “Fits your preferences”. Anything with one of your allergens is flagged before you add it.</p></div></div>
+        <div class="fs"><i style="background:linear-gradient(135deg,#C04A8C,var(--beet))">3</i><div><h3>Your details stay private</h3><p>Only our dietitian and doctor can see the health details you share. Kitchen staff, riders and cashiers never do, and they never appear in notifications or on food labels.</p></div></div>
+        <div class="fs" style="background:var(--turmeric-l);border-color:#F6DE9A"><i style="background:var(--turmeric)">!</i><div><h3>Good food, not medical treatment</h3><p>Our dietitian's reviews help you choose balanced meals. They are not medical advice — please follow your own doctor's guidance for any health condition.</p></div></div>
       </div>
     </div>
   </div>

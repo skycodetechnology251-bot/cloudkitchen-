@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Staff login · Daily Table</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Staff login · {{ \App\Support\Brand::name() }}</title>
 <meta name="theme-color" content="#1F8A4C">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/dt.css') }}"><link rel="stylesheet" href="{{ asset('css/site.css') }}">
+@include('partials.brand-head')
 <style>
   .lg{min-height:100vh;display:flex;flex-wrap:wrap;background:var(--cream)}
   .lg-art{flex:1 1 420px;position:relative;overflow:hidden;background:linear-gradient(150deg,#8CC63F 0%,#1F8A4C 45%,#0F4D2C 100%);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:space-between;gap:28px}
-  .lg-art h1{font-family:'Fraunces',serif;font-size:clamp(36px,4vw,56px);line-height:1.05;color:#fff;margin:0}
+  .lg-art h1{font-family:var(--font-head);font-size:clamp(36px,4vw,56px);line-height:1.05;color:#fff;margin:0}
   .lg-art p{color:#DDF1E3;font-size:17px;line-height:1.6;max-width:440px}
   .lg-art .blob{position:absolute;border-radius:50%}
   .lg-form{flex:1 1 420px;display:flex;align-items:center;justify-content:center;padding:32px}
@@ -24,7 +24,7 @@
     <span class="blob" style="width:220px;height:220px;right:-60px;top:-50px;background:radial-gradient(circle at 35% 30%,#FFD36B,#F4B400)"></span>
     <span class="blob" style="width:140px;height:140px;right:90px;bottom:60px;background:radial-gradient(circle at 35% 30%,#FF8A80,#E0433B);opacity:.9"></span>
     <span class="blob" style="width:90px;height:90px;left:-20px;bottom:180px;background:radial-gradient(circle at 35% 30%,#FFB27A,#F2711C);opacity:.9"></span>
-    <a href="{{ route('home') }}" class="s-logo" style="color:#fff;position:relative"><i><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1F8A4C" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 11h16a8 8 0 0 1-16 0Z"/><path d="M12 7c0-2 1.5-3.5 3.5-3.5 0 2-1.5 3.5-3.5 3.5ZM12 7c0-1.6-1-3-3-3"/></svg></i>Daily Table</a>
+    <a href="{{ route('home') }}" class="s-logo" style="color:#fff;position:relative">@include('partials.brand-mark', ['size' => 40])</a>
     <div style="position:relative">
       <h1>Good food starts with a good team.</h1>
       <p>Sign in to run today's lunch: orders, the counter POS, kitchen boards, menus, branches and reports.</p>
@@ -35,7 +35,7 @@
   <section class="lg-form">
     <form method="post" action="/staff/login" class="lg-card">@csrf
       <span class="s-kicker k-leaf">Staff only</span>
-      <h2 style="font-family:'Fraunces',serif;font-size:32px;margin:12px 0 18px">Sign in</h2>
+      <h2 style="font-family:var(--font-head);font-size:32px;margin:12px 0 18px">Sign in</h2>
       @if($errors->any())<div class="flash bad">{{ $errors->first() }}</div>@endif
       <div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus autocomplete="username"></div>
       <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" required autocomplete="current-password"></div>

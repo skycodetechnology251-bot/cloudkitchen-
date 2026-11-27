@@ -1,11 +1,12 @@
 @php($s = $invoice->snapshot) @php($t = $s['totals']) @php($rate = $s['rate'] / 2)
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>Invoice {{ $invoice->number }}</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="{{ asset('css/dt.css') }}">
+<link rel="stylesheet" href="{{ asset('css/dt.css') }}">
+@include('partials.brand-head')
 <style>@page{size:A4;margin:14mm}body{background:#fff}.inv{max-width:794px;margin:0 auto;padding:40px}@media print{.noprint{display:none}.inv{padding:0}}th,td{font-size:12.5px;padding:9px 8px}</style></head>
 <body><div class="inv">
   <div class="row between noprint" style="margin-bottom:16px"><span class="chip">Tax invoice</span><button class="btn small" onclick="window.print()">Print or save as PDF</button></div>
-  <div class="row between" style="align-items:flex-start"><div class="row">@include('partials.logo')<div><b style="font-size:20px">Daily Table</b><br><span class="small muted">{{ $s['seller']['kitchen'] }}</span></div></div>
+  <div class="row between" style="align-items:flex-start"><div class="row">@if(\App\Support\Brand::logoUrl())<img src="{{ \App\Support\Brand::logoUrl() }}" alt="" style="height:44px;width:auto;max-width:160px;object-fit:contain">@else @include('partials.logo') @endif<div><b style="font-size:20px;font-family:var(--font-head)">{{ \App\Support\Brand::name() }}</b><br><span class="small muted">{{ $s['seller']['kitchen'] }}</span></div></div>
     <div style="text-align:right"><div style="font-size:26px;font-weight:800">TAX INVOICE</div><div class="small muted">Original for recipient</div></div></div>
   <div class="grid" style="grid-template-columns:repeat(3,1fr);margin:22px 0;font-size:12.5px;line-height:1.6">
     <div><div class="small muted" style="font-weight:800">SOLD BY</div><b>{{ $s['seller']['name'] }}</b><br>{{ $s['seller']['address'] }}<br>GSTIN {{ $s['seller']['gstin'] ?? '—' }}<br>FSSAI {{ $s['seller']['fssai'] ?? '—' }}</div>

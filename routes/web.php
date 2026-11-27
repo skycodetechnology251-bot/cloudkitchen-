@@ -82,6 +82,8 @@ Route::middleware(['auth', 'role:admin,ops,kitchen_manager,kitchen_staff,cashier
         Route::post('system/update', [Admin\SystemController::class, 'update'])->middleware('throttle:3,10')->name('system.update');
         Route::get('system/backups/{file}', [Admin\SystemController::class, 'backup'])->where('file', '[A-Za-z0-9_.\-]+')->name('system.backup');
         Route::get('settings', [Admin\SettingController::class, 'index'])->name('settings.index');
+        Route::get('branding', [Admin\BrandingController::class, 'show'])->name('branding');
+        Route::post('branding', [Admin\BrandingController::class, 'update'])->middleware('throttle:20,1')->name('branding.update');
         Route::put('settings/{group}', [Admin\SettingController::class, 'update'])->name('settings.update');
     });
     Route::middleware('perm:fin.reports')->group(function () {

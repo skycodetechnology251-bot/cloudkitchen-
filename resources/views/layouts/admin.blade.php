@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
-<title>@yield('title', 'Staff') · Daily Table</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>@yield('title', 'Staff') · {{ \App\Support\Brand::name() }}</title>
+@include('partials.brand-head')
 <link rel="stylesheet" href="{{ asset('css/dt.css') }}">
 @stack('head')
 </head>
@@ -13,10 +13,11 @@
 @php($posKitchen = request()->route('kitchen') instanceof \App\Models\Kitchen && request()->routeIs('admin.pos') ? request()->route('kitchen') : null)
 <div class="staff">
   <nav class="side" aria-label="Staff">
-    <div class="brand">@include('partials.logo') Daily Table</div>
+    <div class="brand">@include('partials.brand-mark', ['size' => 38])</div>
     <span class="chip" style="align-self:flex-start;margin:0 8px 12px">{{ strtoupper($u->role->name) }}</span>
     @php($ic = [
       'home' => '<path d="M3 11 12 4l9 7v9h-6v-6H9v6H3z"/>',
+      'palette' => '<path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 2-2s-1-1.5-1-2.5S14 15 15 15h2a4 4 0 0 0 4-4c0-4.4-4-8-9-8Z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7" r="1.2"/><circle cx="15" cy="7.5" r="1.2"/>',
       'receipt' => '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',
       'calendar' => '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
       'bowl' => '<path d="M4 11h16a8 8 0 0 1-16 0ZM12 3v4M8 5v2M16 5v2"/>',
@@ -38,7 +39,7 @@
       ['Catalogue & areas', [['admin.dishes.index', 'Dishes', 'menu.edit', 'bowl', 'coral'], ['admin.zones.index', 'Zones', 'zones.edit', 'pin', 'pink'], ['admin.branches.index', 'Branches', 'zones.edit', 'store', 'green']]],
       ['Marketing', [['admin.banners.index', 'Banners & popups', 'mkt.banners', 'image', 'purple'], ['admin.offers.index', 'Offers', 'mkt.banners', 'tag', 'pink']]],
       ['Money', [['admin.expenses.index', 'Purchases & expenses', 'expenses.edit', 'cart', 'amber'], ['admin.reports', 'Reports', 'fin.reports', 'chart', 'sky'], ['admin.salaries', 'Salaries & payroll', 'staff.salary', 'wallet', 'green']]],
-      ['Team & settings', [['admin.staff.index', 'Staff', 'staff.manage', 'users', 'blue'], ['admin.roles.index', 'Roles & permissions', 'staff.roles', 'shield', 'purple'], ['admin.settings.index', 'Integrations', 'settings.manage', 'plug', 'sky'], ['admin.system', 'System & updates', 'settings.manage', 'cog', 'grey']]],
+      ['Team & settings', [['admin.staff.index', 'Staff', 'staff.manage', 'users', 'blue'], ['admin.roles.index', 'Roles & permissions', 'staff.roles', 'shield', 'purple'], ['admin.branding', 'Branding', 'settings.manage', 'palette', 'pink'], ['admin.settings.index', 'Integrations', 'settings.manage', 'plug', 'sky'], ['admin.system', 'System & updates', 'settings.manage', 'cog', 'grey']]],
     ])
     @foreach($groups as [$gname, $glinks])
       @php($visible = array_filter($glinks, fn ($l) => ! $l[2] || $u->hasPermission($l[2])))
