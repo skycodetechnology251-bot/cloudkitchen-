@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\Install\DatabaseProvisioner;
 use App\Support\Install\Installer;
 use App\Support\Install\InstallState;
 use Illuminate\Http\RedirectResponse;
@@ -12,8 +11,8 @@ use Illuminate\View\View;
 use Throwable;
 
 /**
- * Browser setup wizard at /install: no terminal needed. One page: server check, database,
- * admin account. Also updates an existing Daily Table database (backup first, data kept).
+ * Browser setup wizard at /install: no terminal needed. One page: server check, database
+ * (created beforehand in the hosting panel), admin account. Also updates an existing Daily Table database (backup first, data kept).
  * Available only until Daily Table is installed (OnlyBeforeInstall returns 404 afterwards).
  */
 class InstallController extends Controller
@@ -45,9 +44,6 @@ class InstallController extends Controller
             'db_database' => ['required', 'regex:/^[A-Za-z0-9_]{1,64}$/'],
             'db_username' => ['required', 'regex:/^[A-Za-z0-9_.\-]{1,80}$/'],
             'db_password' => ['nullable', 'string', 'max:200'],
-            'create_database' => ['nullable', 'boolean'],
-            'admin_username' => ['required_if:create_database,1', 'nullable', 'string', 'max:80'],
-            'admin_password' => ['nullable', 'string', 'max:200'],
             'app_name' => ['required', 'string', 'max:60', 'regex:/^[^\r\n"\\\\$]+$/'],
             'admin_name' => ['required', 'string', 'max:120'],
             'admin_email' => ['required', 'email', 'max:190'],
@@ -56,7 +52,6 @@ class InstallController extends Controller
         ], [
             'db_database.regex' => 'Use only letters, digits and underscores.',
             'db_username.regex' => 'Use only letters, digits, dots, dashes and underscores.',
-            'admin_username.required_if' => 'Enter the MySQL admin user (often root), or untick "Create the database for me".',
         ], [
             'admin_pass' => 'password', 'admin_name' => 'name', 'admin_email' => 'email', 'app_name' => 'site name',
         ]);
@@ -65,33 +60,21 @@ class InstallController extends Controller
             'host' => $data['db_host'], 'port' => (int) $data['db_port'], 'database' => $data['db_database'],
             'username' => $data['db_username'], 'password' => (string) ($data['db_password'] ?? ''),
         ];
-        $keepInput = $request->except(['db_password', 'admin_password', 'admin_pass', 'admin_pass_confirmation']);
+        $keepInput = $request->except(['db_password', 'admin_pass', 'admin_pass_confirmation']);
 
-        // 1. Optionally create the database and user with MySQL admin access (not saved).
-        if ($request->boolean('create_database')) {
-            try {
-                DatabaseProvisioner::connect([
-                    'user' => $data['admin_username'], 'password' => (string) ($data['admin_password'] ?? ''),
-                    'host' => $db['host'], 'port' => $db['port'],
-                ])->provision($db['database'], $db['username'], $db['password'], ['localhost', '127.0.0.1'], resetPassword: true);
-            } catch (Throwable $e) {
-                throw ValidationException::withMessages(['admin_username' => 'Could not create the database: '.Installer::mysqlReason($e)]);
-            }
-        }
-
-        // 2. Try the database on a scratch connection; switch to it only once it works.
+        // 1. Try the database on a scratch connection; switch to it only once it works.
         try {
             Installer::useDatabase($db);
         } catch (Throwable $e) {
             throw ValidationException::withMessages(['db_password' => 'Could not connect to MySQL: '.Installer::mysqlReason($e)]);
         }
 
-        // 3. Save the settings.
+        // 2. Save the settings.
         $url = rtrim($request->root(), '/');
         InstallState::writeEnv(Installer::envFor($db, $url, $request->isSecure(), $data['app_name']));
         config(['app.name' => $data['app_name'], 'app.url' => $url]);
 
-        // 4. Tables, roles, admin, demo data, lock.
+        // 3. Tables, roles, admin, demo data, lock.
         try {
             $result = (new Installer)->run(fn (string $label, callable $work) => $work(), [
                 'name' => $data['admin_name'], 'email' => $data['admin_email'], 'password' => $data['admin_pass'],

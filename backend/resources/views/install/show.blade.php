@@ -22,7 +22,7 @@
     @csrf
     <fieldset>
       <legend>Database (MySQL)</legend>
-      <p class="hint" style="margin:0 0 12px">Create a MySQL database and user in your hosting panel first and give the user ALL PRIVILEGES on it — or tick the box below. On most hosting the host is <code>localhost</code>.</p>
+      <p class="hint" style="margin:0 0 12px">Create a MySQL database and user in your hosting panel first (cPanel or hPanel → MySQL Databases) and give the user ALL PRIVILEGES on it. On most hosting the host is <code>localhost</code>.</p>
       <div class="fields">
         <div>
           <label for="db_host">Host</label>
@@ -49,21 +49,6 @@
           <label for="db_password">Database password</label>
           <input id="db_password" name="db_password" type="password" autocomplete="new-password" @error('db_password') class="is-invalid" @enderror>
           @error('db_password')<span class="err">{{ $message }}</span>@enderror
-        </div>
-        <div class="wide">
-          <label class="check"><input type="checkbox" name="create_database" value="1" id="create_database" @checked(old('create_database'))> <span>Create the database and user for me <span class="hint">Needs a MySQL admin login such as root — usually only on your own VPS, not on shared hosting.</span></span></label>
-        </div>
-      </div>
-      <div class="fields" id="admin-fields" style="margin-top:12px" @unless (old('create_database')) hidden @endunless>
-        <div>
-          <label for="admin_username">MySQL admin user</label>
-          <input id="admin_username" name="admin_username" type="text" value="{{ old('admin_username', 'root') }}" @error('admin_username') class="is-invalid" @enderror>
-          @error('admin_username')<span class="err">{{ $message }}</span>@enderror
-        </div>
-        <div>
-          <label for="admin_password">MySQL admin password</label>
-          <input id="admin_password" name="admin_password" type="password" autocomplete="new-password">
-          <span class="hint">Used once to create the database; it is not saved.</span>
         </div>
       </div>
     </fieldset>
@@ -129,8 +114,6 @@
 @push('scripts')
 <script>
   (function () {
-    var box = document.getElementById('create_database'), panel = document.getElementById('admin-fields');
-    box.addEventListener('change', function () { panel.hidden = !box.checked; });
     document.querySelector('form').addEventListener('submit', function () {
       var b = document.getElementById('install-btn'); b.disabled = true; b.textContent = 'Installing… please wait';
     });

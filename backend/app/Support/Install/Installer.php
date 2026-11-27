@@ -47,7 +47,7 @@ class Installer
 
         return match (true) {
             str_contains($m, '1045') || str_contains($m, 'Access denied') => 'the user name or password is wrong.',
-            str_contains($m, '1049') || str_contains($m, 'Unknown database') => 'the database does not exist. Create it in your hosting panel (cPanel → MySQL Databases), or tick "Create the database for me".',
+            str_contains($m, '1049') || str_contains($m, 'Unknown database') => 'the database does not exist. Create it in your hosting panel (cPanel or hPanel → MySQL Databases) and check the name.',
             str_contains($m, '2002') || str_contains($m, 'Connection refused') || str_contains($m, 'getaddrinfo') => 'MySQL is not reachable at that host and port. On most hosting the host is "localhost".',
             str_contains($m, '1044') => 'this user has no rights on that database. In cPanel → MySQL Databases, add the user to the database with ALL PRIVILEGES.',
             default => (string) preg_replace('/^SQLSTATE\[[^\]]+\]\s*(\[\d+\])?\s*/', '', (string) strtok($m, "\n")),
