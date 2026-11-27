@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "Daily Table",
+    "slug": "daily-table",
+    "scheme": "dailytable",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
+    "splash": { "image": "./assets/icon.png", "resizeMode": "contain", "backgroundColor": "#0F5C4D" },
+    "ios": {
+      "bundleIdentifier": "in.dailytable.app",
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Daily Table uses your location to fill in your delivery address and pick your saved address when you are there."
+      }
+    },
+    "android": {
+      "package": "in.dailytable.app",
+      "versionCode": 1,
+      "adaptiveIcon": { "foregroundImage": "./assets/icon.png", "backgroundColor": "#0F5C4D" },
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "POST_NOTIFICATIONS"]
+    },
+    "plugins": [
+      "expo-secure-store",
+      ["expo-location", { "locationWhenInUsePermission": "Daily Table uses your location to fill in your delivery address." }],
+      ["expo-notifications", { "color": "#0F5C4D" }]
+    ],
+    "extra": {
+      "apiUrl": "https://wownaturals.in",
+      "googleAndroidClientId": "",
+      "googleIosClientId": "",
+      "googleWebClientId": "",
+      "eas": { "projectId": "" }
+    }
+  }
+}

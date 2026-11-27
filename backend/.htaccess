@@ -1,0 +1,23 @@
+# Daily Table - only used when your domain points at this folder instead of "public".
+# Best setup: cPanel → Domains → set the document root to .../backend/public (then this file is ignored).
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Allow cPanel AutoSSL / Let's Encrypt domain checks (needed for HTTPS).
+    RewriteRule ^\.well-known/ - [L]
+
+    # Never serve hidden files such as .env or .git.
+    RewriteRule (^|/)\. - [F,L]
+
+    # Send everything into public/ exactly once (no loop, also works in a sub-folder).
+    RewriteRule ^$ public/ [L]
+    RewriteRule ^((?!public/).*)$ public/$1 [L]
+</IfModule>
+
+# If mod_rewrite is missing, at least keep secrets private.
+<IfModule !mod_rewrite.c>
+    <FilesMatch "^\.">
+        Require all denied
+    </FilesMatch>
+</IfModule>

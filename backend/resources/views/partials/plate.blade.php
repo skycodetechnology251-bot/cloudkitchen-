@@ -1,0 +1,2 @@
+{{-- Top-down plate illustration used when a dish has no photo yet --}}
+<svg width="{{ $size ?? 96 }}" height="{{ $size ?? 96 }}" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#FFFDF7" stroke="#E6EEEA" stroke-width="2"/><path d="M10 68C22 26 66 10 92 24 86 70 44 90 10 68Z" fill="#4E9F5D"/><circle cx="58" cy="44" r="16" fill="#FBF8EE"/><circle cx="30" cy="64" r="9" fill="#D5DAD6"/><circle cx="30" cy="64" r="7.4" fill="#D9822B"/><circle cx="60" cy="72" r="8.5" fill="#D5DAD6"/><circle cx="60" cy="72" r="7" fill="#FFFFFF"/></svg>

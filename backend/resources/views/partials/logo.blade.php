@@ -1,0 +1,1 @@
+<span class="logo" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#BFE8D6" stroke-width="2.2"><path d="M4 11h16a8 8 0 0 1-16 0ZM12 3v4M8 5v2M16 5v2"/></svg></span>

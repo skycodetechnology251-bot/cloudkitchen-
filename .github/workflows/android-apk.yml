@@ -1,0 +1,112 @@
+# Builds installable Android APKs for the customer app and the delivery-partner app.
+# Runs on every push to main, on version tags (v1.0.0 → GitHub Release with both APKs) and by hand.
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+    paths: ['mobile/**', '.github/workflows/android-apk.yml']
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: 'Backend URL the apps talk to (e.g. https://wownaturals.in)'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [customer, rider]
+    defaults:
+      run:
+        working-directory: mobile/${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Point the app at your backend
+        env:
+          API_URL: ${{ github.event.inputs.api_url || vars.API_URL }}
+          GOOGLE_ANDROID_CLIENT_ID: ${{ vars.GOOGLE_ANDROID_CLIENT_ID }}
+          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
+        run: |
+          node -e "
+            const fs=require('fs'); const a=JSON.parse(fs.readFileSync('app.json'));
+            if (process.env.API_URL) a.expo.extra.apiUrl=process.env.API_URL;
+            if (process.env.GOOGLE_ANDROID_CLIENT_ID && 'googleAndroidClientId' in a.expo.extra) a.expo.extra.googleAndroidClientId=process.env.GOOGLE_ANDROID_CLIENT_ID;
+            if (process.env.GOOGLE_WEB_CLIENT_ID && 'googleWebClientId' in a.expo.extra) a.expo.extra.googleWebClientId=process.env.GOOGLE_WEB_CLIENT_ID;
+            a.expo.android.versionCode=Number(process.env.GITHUB_RUN_NUMBER);
+            fs.writeFileSync('app.json', JSON.stringify(a,null,2));
+            console.log('API:', a.expo.extra.apiUrl);"
+
+      - name: Install packages
+        run: |
+          npm install --no-audit --no-fund
+          npx expo install --fix
+
+      - name: Generate native Android project
+        run: npx expo prebuild --platform android --no-install --clean
+
+      - name: Signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
+            cat >> android/gradle.properties <<PROPS
+          DT_STORE_FILE=release.keystore
+          DT_STORE_PASSWORD=$KEYSTORE_PASSWORD
+          DT_KEY_ALIAS=$KEY_ALIAS
+          DT_KEY_PASSWORD=$KEY_PASSWORD
+          PROPS
+            # Use the release key instead of the debug key Expo sets by default
+            node -e "
+              const fs=require('fs'); const p='android/app/build.gradle'; let g=fs.readFileSync(p,'utf8');
+              g=g.replace(/signingConfigs \{/, 'signingConfigs {\n        dtRelease {\n            storeFile file(DT_STORE_FILE)\n            storePassword DT_STORE_PASSWORD\n            keyAlias DT_KEY_ALIAS\n            keyPassword DT_KEY_PASSWORD\n        }');
+              g=g.replace(/(release \{[\s\S]*?)signingConfig signingConfigs\.debug/, '\$1signingConfig signingConfigs.dtRelease');
+              fs.writeFileSync(p,g);"
+            echo "Signed with your release key"
+          else
+            echo "::warning::No ANDROID_KEYSTORE_BASE64 secret – APK is signed with a debug key (fine for testing, not for Play Store)."
+          fi
+
+      - name: Build APK
+        working-directory: mobile/${{ matrix.app }}/android
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
+
+      - name: Name the APK
+        run: |
+          mkdir -p ../../dist
+          cp android/app/build/outputs/apk/release/app-release.apk ../../dist/daily-table-${{ matrix.app }}.apk
+          ls -lh ../../dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: daily-table-${{ matrix.app }}-apk
+          path: dist/daily-table-${{ matrix.app }}.apk
+          retention-days: 30
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/daily-table-${{ matrix.app }}.apk
