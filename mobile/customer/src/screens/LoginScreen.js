@@ -13,6 +13,25 @@ import { useAuth } from '../auth';
 
 WebBrowser.maybeCompleteAuthSession();
 const extra = Constants.expoConfig?.extra || {};
+// Google sign-in needs the client ID for THIS platform (Android: android ID, iPhone: iOS ID). Without it the
+// Google library throws while the screen is drawn, so the button (and its hook) only exist when the ID is set.
+const platformClientId = Platform.OS === 'android' ? extra.googleAndroidClientId : Platform.OS === 'ios' ? extra.googleIosClientId : extra.googleWebClientId;
+const googleReady = !!platformClientId;
+
+/** "Continue with Google". Rendered only when this platform's client ID is configured. */
+function GoogleButton({ disabled, onIdToken }) {
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    androidClientId: extra.googleAndroidClientId || undefined,
+    iosClientId: extra.googleIosClientId || undefined,
+    webClientId: extra.googleWebClientId || undefined,
+  });
+  useEffect(() => { if (response?.type === 'success') onIdToken(response.params.id_token); }, [response]);
+  return (
+    <Pressable accessibilityRole="button" disabled={!request || disabled} onPress={() => promptAsync().catch(() => {})}>
+      <Glass style={{ minHeight: 54, borderRadius: 999, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}><Icon name="globe" /><Text style={{ fontWeight: '800', fontSize: 16, color: C.ink }}>Continue with Google</Text></Glass>
+    </Pressable>
+  );
+}
 
 export default function LoginScreen({ navigation }) {
   const insets = useSafeAreaInsets();
@@ -25,13 +44,6 @@ export default function LoginScreen({ navigation }) {
   const [focus, setFocus] = useState(false);
   const zoom = useRef(new Animated.Value(1)).current;
 
-  const googleReady = !!(extra.googleAndroidClientId || extra.googleIosClientId || extra.googleWebClientId);
-  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-    androidClientId: extra.googleAndroidClientId || undefined,
-    iosClientId: extra.googleIosClientId || undefined,
-    webClientId: extra.googleWebClientId || undefined,
-  });
-
   useEffect(() => {
     api('/banners', { query: { placement: 'login' } }).then((b) => setBanner(b[0] || null)).catch(() => {});
     Animated.loop(Animated.sequence([
@@ -40,17 +52,14 @@ export default function LoginScreen({ navigation }) {
     ])).start();
   }, [zoom]);
 
-  useEffect(() => {
-    if (response?.type !== 'success') return;
-    (async () => {
-      try {
-        setBusy(true);
-        const r = await api('/auth/google', { method: 'POST', body: { id_token: response.params.id_token, device: Platform.OS } });
-        if (r.needs_phone) { setGoogleLink(r.google_link_token); setError('Google account linked. Now verify your mobile number to finish.'); }
-        else await signIn(r);
-      } catch (e) { setError(e.message); } finally { setBusy(false); }
-    })();
-  }, [response]);
+  const googleSignIn = async (idToken) => {
+    try {
+      setBusy(true);
+      const r = await api('/auth/google', { method: 'POST', body: { id_token: idToken, device: Platform.OS } });
+      if (r.needs_phone) { setGoogleLink(r.google_link_token); setError('Google account linked. Now verify your mobile number to finish.'); }
+      else await signIn(r);
+    } catch (e) { setError(e.message); } finally { setBusy(false); }
+  };
 
   const send = async () => {
     setError('');
@@ -100,9 +109,7 @@ export default function LoginScreen({ navigation }) {
           {googleReady ? (
             <Rise index={3} style={{ gap: 14 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}><View style={{ flex: 1, height: 1, backgroundColor: '#D5E2DD' }} /><Muted>or</Muted><View style={{ flex: 1, height: 1, backgroundColor: '#D5E2DD' }} /></View>
-              <Pressable accessibilityRole="button" disabled={!request || busy} onPress={() => promptAsync()}>
-                <Glass style={{ minHeight: 54, borderRadius: 999, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}><Icon name="globe" /><Text style={{ fontWeight: '800', fontSize: 16, color: C.ink }}>Continue with Google</Text></Glass>
-              </Pressable>
+              <GoogleButton disabled={busy} onIdToken={googleSignIn} />
             </Rise>
           ) : null}
           <Text style={{ textAlign: 'center', fontSize: 12, color: C.muted, lineHeight: 18, marginTop: 6 }}>

@@ -30,6 +30,28 @@ import { startWellness } from './src/wellness';
 import WorkoutScreen from './src/screens/WorkoutScreen';
 import CoachScreen from './src/screens/CoachScreen';
 
+/** Catches any screen error and shows a friendly retry screen instead of closing the app. */
+class Guard extends React.Component {
+  constructor(p) { super(p); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  componentDidCatch(error) { console.error('Screen error', error); }
+  render() {
+    if (!this.state.error) return this.props.children;
+    const { Text: T, View: V, Pressable: P } = require('react-native');
+    return (
+      <V style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28, backgroundColor: '#F3F7F5', gap: 12 }}>
+        <T style={{ fontSize: 44 }}>🍛</T>
+        <T style={{ fontSize: 20, fontWeight: '800', color: '#12302A', textAlign: 'center' }}>Something went wrong</T>
+        <T style={{ fontSize: 14, color: '#56706A', textAlign: 'center' }}>Sorry about that. Tap below to try again. If it keeps happening, please contact support.</T>
+        <P accessibilityRole="button" onPress={() => this.setState({ error: null })} style={{ marginTop: 8, backgroundColor: '#0F5C4D', paddingHorizontal: 26, minHeight: 48, borderRadius: 999, justifyContent: 'center' }}>
+          <T style={{ color: '#fff', fontWeight: '800', fontSize: 16 }}>Try again</T>
+        </P>
+      </V>
+    );
+  }
+}
+
+
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
 const theme = { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: C.bg, primary: C.teal, text: C.ink } };
@@ -90,7 +112,7 @@ export default function App() {
         <CartProvider>
           <NavigationContainer theme={theme}>
             <StatusBar style="dark" />
-            <Root />
+            <Guard><Root /></Guard>
           </NavigationContainer>
         </CartProvider>
       </AuthProvider>
