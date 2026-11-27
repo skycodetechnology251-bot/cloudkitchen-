@@ -100,7 +100,7 @@
 <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:18px">
   @foreach($kpis as [$label, $value, $delta, $sub, $tone, $icon])
     <div class="kpi t-{{ $tone }}">
-      <span class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $svg[$icon] !!}</svg></span>
+      <span class="kpi-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $svg[$icon] !!}</svg></span>
       <div class="kpi-label">{{ $label }}</div>
       <div class="kpi-value">{{ $value }}</div>
       @if($delta !== false)<span class="delta">{{ $delta === null ? 'New' : ($delta >= 0 ? '▲ '.$delta.'%' : '▼ '.abs($delta).'%') }}</span>@endif
@@ -158,7 +158,7 @@
   <div class="pipe">
     @foreach($pipeline as [$name, $n, $tone, $icon])
       <div class="st t-{{ $tone }}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $icon !!}</svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $icon !!}</svg>
         <b>{{ $n }}</b><span>{{ $name }}{{ ! $loop->last ? ' →' : '' }}</span>
       </div>
     @endforeach

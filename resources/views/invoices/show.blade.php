@@ -1,7 +1,7 @@
 @php($s = $invoice->snapshot) @php($t = $s['totals']) @php($rate = $s['rate'] / 2)
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>Invoice {{ $invoice->number }}</title>
-<link rel="stylesheet" href="{{ asset('css/dt.css') }}">
+<link rel="stylesheet" href="{{ \App\Support\Asset::v('css/dt.css') }}">
 @include('partials.brand-head')
 <style>@page{size:A4;margin:14mm}body{background:#fff}.inv{max-width:794px;margin:0 auto;padding:40px}@media print{.noprint{display:none}.inv{padding:0}}th,td{font-size:12.5px;padding:9px 8px}</style></head>
 <body><div class="inv">

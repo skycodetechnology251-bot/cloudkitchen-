@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
 <title>@yield('title', 'Staff') · {{ \App\Support\Brand::name() }}</title>
 @include('partials.brand-head')
-<link rel="stylesheet" href="{{ asset('css/dt.css') }}">
+<link rel="stylesheet" href="{{ \App\Support\Asset::v('css/dt.css') }}">
 @stack('head')
 </head>
 <body class="acc-{{ \App\Support\Accent::current() }}">
@@ -47,7 +47,7 @@
         <div class="grp">{{ $gname }}</div>
         @foreach($visible as [$name, $label, $perm, $icon, $color])
           <a href="{{ route($name) }}" class="{{ request()->routeIs(str_replace('.index', '', $name).'*') ? 'on' : '' }}" @if(request()->routeIs(str_replace('.index', '', $name).'*')) aria-current="page" @endif>
-            <span class="ico i-{{ $color }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ic[$icon] !!}</svg></span>{{ $label }}
+            <span class="ico i-{{ $color }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ic[$icon] !!}</svg></span>{{ $label }}
           </a>
         @endforeach
       @endif
@@ -55,7 +55,7 @@
     @if($u->hasPermission('kitchen.board') && $myKitchens->count())
       <div class="grp">Branch kitchen boards</div>
       @foreach($myKitchens as $k)
-        <a href="{{ route('admin.kitchen', $k) }}" class="{{ request()->is('admin/kitchen/'.$k->id) ? 'on' : '' }}"><span class="ico i-coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ic['flame'] !!}</svg></span>{{ $k->name }}</a>
+        <a href="{{ route('admin.kitchen', $k) }}" class="{{ request()->is('admin/kitchen/'.$k->id) ? 'on' : '' }}"><span class="ico i-coral"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ic['flame'] !!}</svg></span>{{ $k->name }}</a>
       @endforeach
     @endif
     <div class="who" style="margin-top:auto;padding:14px 8px 0;border-top:1px solid var(--line);font-size:13px">
@@ -88,6 +88,25 @@
       @endif
       <div class="topbar-user"><span class="small"><b>{{ $u->name }}</b> · {{ $u->role->name }}</span></div>
     </header>
+    {{-- Shown when the new design's stylesheet did not load (old file on the server, or an old cached copy). Inline styles on purpose. --}}
+    @php($cssStale = \App\Support\Asset::staleCss())
+    <div id="css-warning" role="alert" style="{{ $cssStale ? '' : 'display:none;' }}margin:0 0 16px;padding:14px 18px;border-radius:14px;background:#FDE6E4;color:#8E1F19;border:2px solid #E0433B;font:600 15px/1.5 system-ui,sans-serif">
+      <b style="display:block;font-size:16px;margin-bottom:4px">⚠️ The new design's styles did not load</b>
+      @if($cssStale)
+        The file <code>public/css/dt.css</code> on your server is from an older version. Upload the whole <code>public</code> folder (especially <code>public/css</code>) from the latest zip, then press <b>Ctrl + Shift + R</b> (Mac: <b>Cmd + Shift + R</b>).
+      @else
+        Your browser or hosting is showing an old saved copy. Press <b>Ctrl + Shift + R</b> (Mac: <b>Cmd + Shift + R</b>). If you use LiteSpeed Cache or Cloudflare, purge its cache once.
+      @endif
+    </div>
+    <script>
+      (function () {
+        function check() {
+          var ok = getComputedStyle(document.body).getPropertyValue('--acc1').trim() !== '';
+          if (!ok) document.getElementById('css-warning').style.display = 'block';
+        }
+        if (document.readyState === 'complete') check(); else window.addEventListener('load', check);
+      })();
+    </script>
     @if(session('status'))<div class="flash">{{ session('status') }}</div>@endif
     @if($errors->any())<div class="flash bad">{{ $errors->first() }}</div>@endif
     @yield('content')

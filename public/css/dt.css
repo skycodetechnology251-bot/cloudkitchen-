@@ -1,3 +1,4 @@
+/* dt-css 1.13 · Daily Table admin + shared styles */
 /* Daily Table — shared styles for the website, staff web and invoices */
 :root{--font-head:'Fraunces',Georgia,serif;--font-body:'Manrope',system-ui,sans-serif;--teal:#0F5C4D;--teal-2:#1D7564;--mint:#BFE8D6;--mint-2:#E3F1EC;--bg:#F3F7F5;--ink:#12302A;--muted:#56706A;--line:#E6EEEA;--warn:#FBF0D6;--warn-ink:#6B4A06;--bad:#FBEAE2;--bad-ink:#8A3A17;--radius:20px}
 *{box-sizing:border-box}html{scroll-behavior:smooth}

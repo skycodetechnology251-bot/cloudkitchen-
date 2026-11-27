@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Staff login · {{ \App\Support\Brand::name() }}</title>
 <meta name="theme-color" content="#1F8A4C">
-<link rel="stylesheet" href="{{ asset('css/dt.css') }}"><link rel="stylesheet" href="{{ asset('css/site.css') }}">
+<link rel="stylesheet" href="{{ \App\Support\Asset::v('css/dt.css') }}"><link rel="stylesheet" href="{{ \App\Support\Asset::v('css/site.css') }}">
 @include('partials.brand-head')
 <style>
   .lg{min-height:100vh;display:flex;flex-wrap:wrap;background:var(--cream)}

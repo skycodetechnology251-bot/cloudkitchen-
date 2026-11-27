@@ -9,8 +9,8 @@
 <meta property="og:title" content="{{ $seo['title'] }}"><meta property="og:description" content="{{ $seo['description'] }}"><meta property="og:type" content="website">
 <meta property="og:image" content="{{ asset('images/app/home.webp') }}">
 <meta name="theme-color" content="#1F8A4C">
-<link rel="stylesheet" href="{{ asset('css/dt.css') }}">
-<link rel="stylesheet" href="{{ asset('css/site.css') }}">
+<link rel="stylesheet" href="{{ \App\Support\Asset::v('css/dt.css') }}">
+<link rel="stylesheet" href="{{ \App\Support\Asset::v('css/site.css') }}">
 @include('partials.brand-head')
 @stack('head')
 </head>

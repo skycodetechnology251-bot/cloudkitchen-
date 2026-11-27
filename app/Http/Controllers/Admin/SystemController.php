@@ -56,7 +56,9 @@ class SystemController extends Controller
         }
         AuditService::log('system.update', null, ['from' => $result['from'], 'to' => $result['to'], 'migrations' => count($result['migrations'])]);
 
-        return back()->with('status', 'Updated to '.$result['to'].'. '.count($result['migrations']).' database update(s) applied'.($result['backup'] ? ', backup saved first.' : '.'));
+        // LiteSpeed hosting: clear its page/file cache so everyone gets the new design straight away.
+        return back()->with('status', 'Updated to '.$result['to'].'. '.count($result['migrations']).' database update(s) applied'.($result['backup'] ? ', backup saved first.' : '.'))
+            ->header('X-LiteSpeed-Purge', '*');
     }
 
     public function backup(string $file): BinaryFileResponse

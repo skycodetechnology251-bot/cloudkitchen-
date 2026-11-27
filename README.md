@@ -209,3 +209,9 @@ The same app code runs on iPhone. In GitHub → Actions → **iPhone app** → R
 - **Daily workout:** Profile → 🏃 Daily workout (and a card on Today). Log walk, run, yoga, gym, cycling, home workout, dance, sports or swimming with minutes and effort; daily goal, 🔥 streak, 7-day chart, a simple routine for each weekday, and one motivating reminder a day with "Did 20 min" / "In 1 hour" buttons (also on Wear OS and Apple Watch). "Eat for your workout" picks dishes from the menu for before and after exercise.
 - **Smarter water nudges:** besides the regular reminders, the app checks at 3:30 PM and 7 PM and, only if you are behind, tells you how many glasses to drink now.
 - **Wellness coach:** Profile → 🤖 Wellness coach. Off until the customer switches it on. Then the app sends daily totals (glasses, workout type / minutes / effort) to `PUT /api/v1/me/wellness`, and `GET /api/v1/me/coach` returns insights (behind on water, low weekly average, streaks), dishes from the next menu (before / after workout, hydrating, saltier ones with a water reminder) that respect diet and allergies, and a short message. With an OpenAI key in Admin → Integrations the message is written by AI from numbers and dish names only; without one, built-in rules write it. Switching it off deletes the stored days; deleting the account deletes them too.
+
+## After uploading a new version
+
+1. Upload **all** folders from the zip (including `public/`), replacing the old files. Keep your `.env`, `storage/` and `public/uploads/`.
+2. Open Admin → System → **Back up and update now**.
+3. Stylesheets load as `dt.css?v=…`, so browsers fetch the new design automatically. If the admin shows a red "styles did not load" banner, the server still has the old `public/css` — upload it again, then press Ctrl + Shift + R (Mac: Cmd + Shift + R). If you use LiteSpeed Cache or Cloudflare, purge its cache once.
