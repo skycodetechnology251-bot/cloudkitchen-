@@ -338,7 +338,10 @@
 <section class="s-sec" id="download">
   <div class="s-wrap">
     <div class="cta">
-      <div style="flex:1 1 420px;min-width:0"><h2>Tomorrow's lunch starts with one tap.</h2><p>Download Daily Table and we'll ask you at 10 AM.</p></div>
+      <div style="flex:1 1 420px;min-width:0;display:flex;gap:22px;align-items:center;flex-wrap:wrap">
+        <img src="{{ asset('images/app/app-icon.png') }}" alt="Daily Table app icon" width="112" height="112" style="border-radius:28px;box-shadow:0 18px 36px -18px rgba(0,0,0,.45);flex:0 0 112px">
+        <div style="flex:1 1 300px"><h2>Tomorrow's lunch starts with one tap.</h2><p>Download Daily Table and we'll ask you at 10 AM.</p></div>
+      </div>
       <a href="{{ $seo['android_url'] }}" class="s-btn dark big">{!! $android !!}<span class="s2"><small>Download for</small>Android</span></a>
     </div>
   </div>

@@ -34,6 +34,7 @@ function shared() {
 module.exports = function makeConfig(which) {
   const c = shared();
   const app = c[which];
+  const splashColor = which === 'rider' ? '#1A4C8C' : '#14603A';
   const versionCode = Number(process.env.APP_VERSION_CODE || process.env.GITHUB_RUN_NUMBER || 1);
   const location = which === 'rider'
     ? 'While you are on duty, ' + c.brand + ' shares your location with the kitchen so it can assign nearby deliveries.'
@@ -48,15 +49,16 @@ module.exports = function makeConfig(which) {
       orientation: 'portrait',
       userInterfaceStyle: 'light',
       icon: './assets/icon.png',
-      splash: { image: './assets/icon.png', resizeMode: 'contain', backgroundColor: app.color },
+      splash: { image: './assets/splash.png', resizeMode: 'contain', backgroundColor: splashColor },
       ios: { bundleIdentifier: app.package, buildNumber: String(versionCode), supportsTablet: false, infoPlist: { NSLocationWhenInUseUsageDescription: location, ITSAppUsesNonExemptEncryption: false } },
       android: {
         package: app.package,
         versionCode,
-        adaptiveIcon: { foregroundImage: './assets/icon.png', backgroundColor: app.color },
+        // Classic badge icon: gradient background + bowl / scooter mark; monochrome for Android 13 themed icons.
+        adaptiveIcon: { foregroundImage: './assets/adaptive-foreground.png', backgroundImage: './assets/adaptive-background.png', monochromeImage: './assets/adaptive-monochrome.png', backgroundColor: splashColor },
         permissions: ['ACCESS_COARSE_LOCATION', 'ACCESS_FINE_LOCATION', 'POST_NOTIFICATIONS'],
       },
-      plugins: ['expo-secure-store', ['expo-location', { locationWhenInUsePermission: location }], ['expo-notifications', { color: app.color }]],
+      plugins: ['expo-secure-store', ['expo-location', { locationWhenInUsePermission: location }], ['expo-notifications', { color: app.color, icon: './assets/notification-icon.png' }]],
       extra: {
         apiUrl: c.api_url,
         brand: c.brand,
