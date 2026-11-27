@@ -29,7 +29,7 @@ class DemoSeeder extends Seeder
         Zone::firstOrCreate(['slug' => 'besant-nagar'], ['name' => 'Besant Nagar', 'status' => 'testing', 'state' => 'Tamil Nadu', 'city' => 'Chennai', 'pincode' => '600090', 'address' => 'Besant Nagar, Chennai', 'center_lat' => 12.9990, 'center_lng' => 80.2700,
             'polygon' => [[13.0050, 80.2620], [13.0060, 80.2760], [12.9930, 80.2770], [12.9925, 80.2640]]]);
 
-        $kitchen = Kitchen::firstOrCreate(['code' => 'ADY'], ['name' => 'Adyar kitchen', 'legal_name' => '[LEGAL NAME]', 'address' => '[KITCHEN ADDRESS], Adyar, Chennai 600020',
+        $kitchen = Kitchen::firstOrCreate(['code' => 'ADY'], ['name' => 'Adyar kitchen', 'legal_name' => '[LEGAL NAME]', 'address' => '[KITCHEN ADDRESS], Adyar', 'state' => 'Tamil Nadu', 'city' => 'Chennai', 'pincode' => '600020',
             'lat' => 13.0040, 'lng' => 80.2565, 'gstin' => null, 'fssai' => null, 'service_radius_m' => 10000]);
         $kitchen->zones()->syncWithoutDetaching([$zone->id]);
 

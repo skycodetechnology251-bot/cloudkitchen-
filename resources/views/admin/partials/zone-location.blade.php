@@ -1,16 +1,24 @@
 {{--
   Zone location: Country → State → City dropdowns (each filtered by the one before), full address with
   search, "Use my current location", and the delivery boundary drawn on a map.
+  $mode = 'point' (branches): no boundary, the pin is the place, saved as lat / lng; $overlays shows
+  other zones faintly; $radiusInput (an input id, metres) draws a delivery-radius circle.
   Google Maps when Admin → Integrations → Google sign-in & Maps has a Maps key; OpenStreetMap otherwise.
 --}}
 @php
   $mapsKey = \App\Models\Setting::get('google', 'maps_api_key');
+  $point = ($mode ?? 'zone') === 'point';
+  $latName = $point ? 'lat' : 'center_lat';
+  $lngName = $point ? 'lng' : 'center_lng';
   $v = fn ($k, $d = null) => old($k, data_get($item, $k) ?? $d);
   $init = [
     'polygon' => is_array($val) ? $val : (json_decode((string) $val, true) ?: []),
     'country' => $v('country', 'India'), 'country_code' => $v('country_code', 'IN'),
     'state' => $v('state', 'Tamil Nadu'), 'city' => $v('city', 'Chennai'),
-    'center' => $v('center_lat') ? [(float) $v('center_lat'), (float) $v('center_lng')] : null,
+    'center' => $v($latName) ? [(float) $v($latName), (float) $v($lngName)] : null,
+    'overlays' => $overlays ?? [],
+    'point' => $point,
+    'radiusInput' => $radiusInput ?? null,
   ];
 @endphp
 @push('head')
@@ -61,7 +69,11 @@
   </div>
   <div class="zl-status" id="zl-status" role="status" aria-live="polite"></div>
 
-  <div class="zl-map" id="zl-map" role="application" aria-label="Map: click to add boundary points"></div>
+  <div class="zl-map" id="zl-map" role="application" aria-label="{{ $point ? 'Map: click to place the pin' : 'Map: click to add boundary points' }}"></div>
+  @if($point)
+  <p class="small muted" style="margin:8px 0 0">Click the map or drag the pin to the exact spot. @if($overlays ?? [])Purple outlines are your delivery zones; the dashed green circle is how far this branch delivers.@endif {{ $mapsKey ? '' : 'Add a Google Maps key in Integrations to use Google Maps here.' }}</p>
+  @foreach([$latName, $lngName] as $k) @error($k)<div class="zl-err">Place the pin on the map (search the address or use your current location).</div>@break @enderror @endforeach
+  @else
   <div class="zl-tools">
     <span class="small muted" id="zl-count"></span>
     <button type="button" class="btn ghost small" id="zl-undo">Undo last point</button>
@@ -75,14 +87,15 @@
   </div>
   <p class="small muted" style="margin:8px 0 0">Click the map to add boundary points, drag the white dots to adjust them. The pin is the zone's centre: drag it, search an address or use your current location. {{ $mapsKey ? '' : 'Add a Google Maps key in Integrations to use Google Maps here.' }}</p>
   @error('polygon')<div class="zl-err">{{ $message }}</div>@enderror
+  @endif
 
   <input type="hidden" name="country" id="zl-v-country">
   <input type="hidden" name="country_code" id="zl-v-code">
   <input type="hidden" name="state" id="zl-v-state">
   <input type="hidden" name="city" id="zl-v-city">
-  <input type="hidden" name="center_lat" id="zl-v-lat" value="{{ $init['center'][0] ?? '' }}">
-  <input type="hidden" name="center_lng" id="zl-v-lng" value="{{ $init['center'][1] ?? '' }}">
-  <textarea name="{{ $name }}" id="f_{{ $name }}" class="sr" aria-label="Boundary points">{{ json_encode($init['polygon']) }}</textarea>
+  <input type="hidden" name="{{ $latName }}" id="zl-v-lat" value="{{ $init['center'][0] ?? '' }}">
+  <input type="hidden" name="{{ $lngName }}" id="zl-v-lng" value="{{ $init['center'][1] ?? '' }}">
+  @unless($point)<textarea name="{{ $name }}" id="f_{{ $name }}" class="sr" aria-label="Boundary points">{{ json_encode($init['polygon']) }}</textarea>@endunless
 </div>
 
 @push('scripts')
@@ -97,6 +110,8 @@
   var pts = (INIT.polygon || []).map(function (p) { return [+p[0], +p[1]]; });
   var center = INIT.center;
   var engine = null;
+  var POINT = !!INIT.point;
+  function radiusM() { var el = INIT.radiusInput && $(INIT.radiusInput); return el ? (+el.value || 0) * (el.dataset.km ? 1000 : 1) : 0; }
 
   function status(msg, tone) { var s = $('zl-status'); s.textContent = msg || ''; s.className = 'zl-status' + (tone ? ' ' + tone : ''); }
   function opt(sel, value, label, selected) { var o = document.createElement('option'); o.value = value; o.textContent = label; if (selected) o.selected = true; sel.appendChild(o); }
@@ -140,6 +155,8 @@
     $('zl-v-city').value = val('city');
     $('zl-v-lat').value = center ? center[0].toFixed(7) : '';
     $('zl-v-lng').value = center ? center[1].toFixed(7) : '';
+    if (engine && engine.ring) engine.ring();
+    if (POINT) return;
     $('f_{{ $name }}').value = JSON.stringify(pts.map(function (p) { return [+p[0].toFixed(6), +p[1].toFixed(6)]; }));
     $('zl-count').textContent = pts.length + ' boundary point' + (pts.length === 1 ? '' : 's') + (pts.length < 3 ? ' · need at least 3' : '');
   }
@@ -189,11 +206,18 @@
       this.poly = new g.Polygon({ map: this.map, paths: [], editable: true, strokeColor: '#0F5C4D', strokeWeight: 3, fillColor: '#0F5C4D', fillOpacity: 0.18 });
       this.pin = new g.Marker({ map: this.map, draggable: true, title: 'Zone centre', position: center ? { lat: center[0], lng: center[1] } : null });
       this.pin.addListener('dragend', function (e) { center = [e.latLng.lat(), e.latLng.lng()]; sync(); });
-      this.map.addListener('click', function (e) { pts.push([e.latLng.lat(), e.latLng.lng()]); self.draw(false); sync(); });
+      this.map.addListener('click', function (e) { if (POINT) { setCenter(e.latLng.lat(), e.latLng.lng()); return; } pts.push([e.latLng.lat(), e.latLng.lng()]); self.draw(false); sync(); });
+      (INIT.overlays || []).forEach(function (o) {
+        var pg = new g.Polygon({ map: self.map, paths: o.polygon.map(function (p) { return { lat: +p[0], lng: +p[1] }; }), clickable: false, strokeColor: o.mine ? '#7A3FF2' : '#9AA7A3', strokeWeight: 2, fillColor: o.mine ? '#7A3FF2' : '#9AA7A3', fillOpacity: o.mine ? 0.12 : 0.05 });
+      });
+      this.circleShape = new g.Circle({ map: this.map, clickable: false, strokeColor: '#167D49', strokeOpacity: 0.9, strokeWeight: 2, fillColor: '#34B57A', fillOpacity: 0.06 });
       this.draw(false);
       if (pts.length > 2) this.fit();
+      this.ring();
     },
+    ring: function () { if (!this.circleShape) return; var r = radiusM(); this.circleShape.setVisible(!!(center && r)); if (center && r) { this.circleShape.setCenter({ lat: center[0], lng: center[1] }); this.circleShape.setRadius(r); } },
     draw: function (fit) {
+      if (POINT) return;
       var self = this, path = new google.maps.MVCArray(pts.map(function (p) { return new google.maps.LatLng(p[0], p[1]); }));
       this.poly.setPath(path);
       var read = function () { pts = self.poly.getPath().getArray().map(function (ll) { return [ll.lat(), ll.lng()]; }); sync(); };
@@ -224,11 +248,18 @@
       this.pin = L.marker(center || [13.0067, 80.257], { draggable: true, title: 'Zone centre' });
       if (center) this.pin.addTo(this.map);
       this.pin.on('dragend', function (e) { var p = e.target.getLatLng(); center = [p.lat, p.lng]; sync(); });
-      this.map.on('click', function (e) { pts.push([e.latlng.lat, e.latlng.lng]); self.draw(false); sync(); });
+      this.map.on('click', function (e) { if (POINT) { setCenter(e.latlng.lat, e.latlng.lng); return; } pts.push([e.latlng.lat, e.latlng.lng]); self.draw(false); sync(); });
+      (INIT.overlays || []).forEach(function (o) {
+        L.polygon(o.polygon, { interactive: true, color: o.mine ? '#7A3FF2' : '#9AA7A3', weight: 2, fillOpacity: o.mine ? 0.12 : 0.05 }).bindTooltip(o.name).addTo(self.map);
+      });
+      this.circleShape = L.circle(center || [13.0067, 80.257], { radius: 1, interactive: false, color: '#167D49', weight: 2, dashArray: '6 6', fillOpacity: 0.05 });
       this.draw(false);
       if (pts.length > 2) this.fit();
+      this.ring();
     },
+    ring: function () { if (!this.circleShape) return; var r = radiusM(); if (center && r) { this.circleShape.setLatLng(center).setRadius(r).addTo(this.map); } else { this.circleShape.remove(); } },
     draw: function (fit) {
+      if (POINT) return;
       var self = this; this.poly.setLatLngs(pts); this.dots.clearLayers();
       pts.forEach(function (p, i) {
         var m = L.marker(p, { draggable: true, icon: L.divIcon({ className: '', html: '<div class="zl-vx"></div>', iconSize: [0, 0] }) });
@@ -259,7 +290,7 @@
       if (!p) { status('Address not found. Try a nearby landmark or the area name.', 'bad'); return; }
       setCenter(p.lat, p.lng, 15);
       if (p.pincode && !$('zl-pincode').value) $('zl-pincode').value = p.pincode;
-      sync(); status('Found. Drag the pin if needed, then draw the boundary or use "Draw circle".', 'ok');
+      sync(); status(POINT ? 'Found. Drag the pin to the exact door if needed.' : 'Found. Drag the pin if needed, then draw the boundary or use "Draw circle".', 'ok');
     });
   }
   function lookCity() {
@@ -281,10 +312,14 @@
       status(err.code === 1 ? 'Location permission was blocked. Allow location for this site in the browser, or search the address.' : 'Could not get your location. Try again or search the address.', 'bad');
     }, { enableHighAccuracy: true, timeout: 15000 });
   });
-  $('zl-undo').addEventListener('click', function () { pts.pop(); engine.draw(false); sync(); });
-  $('zl-clear').addEventListener('click', function () { pts = []; engine.draw(false); sync(); });
-  $('zl-circle').addEventListener('click', function () { circle(+$('zl-radius').value); });
-  $('zl-fit').addEventListener('click', function () { engine.fit(); });
+  if (!POINT) {
+    $('zl-undo').addEventListener('click', function () { pts.pop(); engine.draw(false); sync(); });
+    $('zl-clear').addEventListener('click', function () { pts = []; engine.draw(false); sync(); });
+    $('zl-circle').addEventListener('click', function () { circle(+$('zl-radius').value); });
+    $('zl-fit').addEventListener('click', function () { engine.fit(); });
+  }
+  if (INIT.radiusInput && $(INIT.radiusInput)) $(INIT.radiusInput).addEventListener('input', function () { if (engine && engine.ring) engine.ring(); });
+  window.dtLocation = { center: function () { return center; } };
 
   // ---------- Start ----------
   fetch($('zl').dataset.locations).then(function (r) { return r.json(); }).then(function (j) {
@@ -298,7 +333,7 @@
 
   engine = GOOGLE ? Google : Osm;
   engine.load(function () {
-    try { engine.init(); sync(); lookCity(); }
+    try { engine.init(); sync(); lookCity(); engine.ready = true; }
     catch (e) { status('The map could not load (check the internet connection or the Maps key). The dropdowns and address still work.', 'bad'); }
   });
   sync();

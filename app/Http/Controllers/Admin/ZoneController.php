@@ -34,6 +34,7 @@ class ZoneController extends CrudController
             'pincode' => ['type' => 'embedded', 'rules' => ['nullable', 'regex:/^[A-Za-z0-9 -]{3,12}$/']],
             'center_lat' => ['type' => 'embedded', 'rules' => 'nullable|numeric|between:-90,90'],
             'center_lng' => ['type' => 'embedded', 'rules' => 'nullable|numeric|between:-180,180'],
+            'kitchen_ids' => ['label' => 'Branches that deliver here', 'type' => 'multiselect', 'options' => \App\Models\Kitchen::orderBy('name')->pluck('name', 'id')->all(), 'value' => $item?->kitchens()->pluck('kitchens.id')->all() ?? [], 'rules' => 'nullable|array', 'help' => 'Add a new branch in Branches; it can create its zones there too.'],
             'status' => ['label' => 'Status', 'type' => 'select', 'options' => ['draft' => 'Draft', 'testing' => 'Testing', 'paused' => 'Paused', 'closed' => 'Closed'], 'rules' => 'required|in:draft,testing,paused,closed', 'help' => 'Going live needs approval: use "Approve go-live" on the list.'],
             'seo_title' => ['label' => 'Area page title (SEO)', 'rules' => 'nullable|string|max:120'],
             'seo_description' => ['label' => 'Area page description (SEO)', 'type' => 'textarea', 'rules' => 'nullable|string|max:300'],
@@ -52,8 +53,17 @@ class ZoneController extends CrudController
         if ($item->exists && $item->polygon != $data['polygon']) {
             $item->version++;
         }
-        $item->slug ??= Str::slug($data['name']);
+        $kitchens = array_map('intval', $data['kitchen_ids'] ?? []);
+        unset($data['kitchen_ids']);
+        if (! $item->slug) {
+            $base = Str::slug($data['name']) ?: 'zone';
+            $item->slug = $base;
+            for ($i = 2; Zone::where('slug', $item->slug)->exists(); $i++) {
+                $item->slug = $base.'-'.$i;
+            }
+        }
         $item->forceFill($data)->save();
+        $item->kitchens()->sync($kitchens);
     }
 
     public function goLive(Zone $zone)

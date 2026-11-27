@@ -55,7 +55,7 @@ The Laravel project serves:
    Without it, background tasks run after page visits instead. Unpaid reservations are still released, but the 9:30 wallet reminder and the 10:00 lunch reminder may be missed.
 7. **Admin → Integrations.** Enter the keys for Razorpay, SMS (OTP), WhatsApp, push, email, Google sign-in and OpenAI. They are stored encrypted.
 8. **Razorpay dashboard.** Set the webhook to `https://wownaturals.in/api/v1/webhooks/razorpay`. Turn on the events `payment.captured`, `payment.failed` and `refund.processed`.
-9. **Admin → Zones, Kitchens, Dishes, Menus.** Draw your delivery areas, add kitchens and dishes, and publish menus.
+9. **Admin → Branches, Zones, Dishes, Menus.** Add each branch (address, map pin, delivery radius, team) and create its delivery zones in the same form, then add dishes and publish each branch's menu.
 
 ### With a terminal instead (SSH or a VPS)
 
@@ -124,7 +124,7 @@ Remove the demo staff before going live.
 
 - There are ten roles. Admin → Roles lets you edit the permissions of each role.
 - Every staff role can use the counter POS. A **POS** button sits in the top bar of every staff page.
-- Staff bill for the kitchens they work in, set in Admin → Staff → Kitchens they work in. Admin and operations managers can bill for every kitchen and switch kitchens from the POS button's menu.
+- Staff bill for the branches they work in, set in Admin → Branches → Team at this branch (or Staff → Branches they work in). Admin and operations managers can bill for every branch and switch branches from the POS button's menu.
 
 **Salaries and payroll** (Admin → Salaries & payroll; admin and finance only)
 
@@ -159,3 +159,14 @@ Remove the demo staff before going live.
   ```
   First set `api_url` in `mobile/app-config.json` to your computer's address, for example `http://192.168.1.20:8000`.
 - **On the server:** the `mobile/` folder is uploaded with the website but is never served to visitors. The `.htaccess` sends every request into `public/`.
+
+## Branches
+
+Admin → Branches lists every branch with today's orders and sales. **+ New branch** asks for:
+
+1. Branch details: name, code (starts its invoice numbers), phone, GSTIN, FSSAI, open for orders.
+2. Location: country → state → city, address, pincode, and a map pin (search, click the map, or use your current location), plus how far it delivers in km.
+3. Delivery zones (at least one): tick existing zones, or create new ones as a circle around the pin. New zones start as Testing (taking orders) or Draft.
+4. Team: the staff and riders who work there. They get that branch's POS and kitchen board.
+
+A customer is served by the nearest open branch whose zone covers their address and that is within its delivery distance. Zones can be shared by several branches, and overlapping zones are fine.

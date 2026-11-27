@@ -45,7 +45,11 @@ Route::middleware(['auth', 'role:admin,ops,kitchen_manager,kitchen_staff,cashier
 
     Route::middleware('perm:zones.edit')->resource('zones', Admin\ZoneController::class)->except('show');
     Route::post('zones/{zone}/go-live', [Admin\ZoneController::class, 'goLive'])->middleware('perm:zones.golive')->name('zones.golive');
-    Route::middleware('perm:zones.edit')->resource('kitchens', Admin\KitchenController::class)->except('show');
+    Route::middleware('perm:zones.edit')->group(function () {
+        Route::resource('branches', Admin\BranchController::class)->except(['show', 'destroy'])->parameters(['branches' => 'kitchen']);
+        Route::post('branches/{kitchen}/toggle', [Admin\BranchController::class, 'toggle'])->name('branches.toggle');
+        Route::get('kitchens/{any?}', fn () => redirect()->route('admin.branches.index'))->where('any', '.*');
+    });
     Route::middleware('perm:menu.edit')->resource('dishes', Admin\DishController::class)->except('show');
     Route::middleware('perm:menu.publish')->group(function () {
         Route::get('menus', [Admin\MenuController::class, 'index'])->name('menus.index');

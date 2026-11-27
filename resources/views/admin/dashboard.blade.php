@@ -15,6 +15,7 @@
   'chart' => '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
   'wallet' => '<rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12h2M3 10h18"/>',
   'pin' => '<path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/>',
+  'store' => '<path d="M4 10h16l-1-5H5zM5 10v10h14V10M10 20v-5h4v5"/>',
 ])
 @php($statusChip = ['delivered' => 'green', 'picked_up' => 'blue', 'packed' => 'sky', 'preparing' => 'amber', 'accepted' => 'amber', 'confirmed' => 'purple', 'pending_payment' => 'grey', 'cancelled' => 'coral', 'failed' => 'coral'])
 @php($zoneChip = ['live' => 'green', 'testing' => 'amber', 'draft' => 'grey', 'paused' => 'coral', 'closed' => 'coral'])
@@ -40,6 +41,7 @@
   $u->hasPermission('menu.publish') ? [route('admin.menus.index'), 'Daily menu', 'Publish tomorrow', 'calendar', 'amber'] : null,
   $u->hasPermission('fin.reports') ? [route('admin.reports'), 'Reports', 'Income, expenses, GST', 'chart', 'sky'] : null,
   $u->hasPermission('staff.salary') ? [route('admin.salaries'), 'Payroll', 'Pay this month', 'wallet', 'green'] : null,
+  $u->hasPermission('zones.edit') ? [route('admin.branches.create'), 'Add a branch', 'With its zones', 'store', 'purple'] : null,
   $u->hasPermission('zones.edit') ? [route('admin.zones.create'), 'Add a zone', 'New delivery area', 'pin', 'pink'] : null,
 ]))
 @if($actions)
@@ -58,7 +60,7 @@
     <div class="row between" style="margin-bottom:8px"><h2 style="font-size:18px">Zones</h2>@if($u->hasPermission('zones.edit'))<a class="btn small" href="{{ route('admin.zones.create') }}">+ Add zone</a>@endif</div>
     <table><tbody>
       @forelse($zones as $z)
-        <tr><td><b>{{ $z->name }}</b>@if($z->city)<div class="small muted">{{ $z->city }}{{ $z->state ? ', '.$z->state : '' }}</div>@endif</td><td>{{ $z->kitchens_count }} kitchen(s)</td><td><span class="chip {{ $zoneChip[$z->status] ?? 'grey' }}">{{ ucfirst($z->status) }}</span></td></tr>
+        <tr><td><b>{{ $z->name }}</b>@if($z->city)<div class="small muted">{{ $z->city }}{{ $z->state ? ', '.$z->state : '' }}</div>@endif</td><td>{{ $z->kitchens_count }} {{ $z->kitchens_count == 1 ? 'branch' : 'branches' }}</td><td><span class="chip {{ $zoneChip[$z->status] ?? 'grey' }}">{{ ucfirst($z->status) }}</span></td></tr>
       @empty
         <tr><td class="muted">No zones yet.</td></tr>
       @endforelse

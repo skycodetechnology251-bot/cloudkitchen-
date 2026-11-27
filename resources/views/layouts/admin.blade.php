@@ -35,7 +35,7 @@
     ])
     @php($groups = [
       ['Daily service', [['admin.dashboard', 'Overview', null, 'home', 'teal'], ['admin.orders.index', 'Orders', 'orders.view', 'receipt', 'blue'], ['admin.menus.index', 'Daily menu', 'menu.publish', 'calendar', 'amber']]],
-      ['Catalogue & areas', [['admin.dishes.index', 'Dishes', 'menu.edit', 'bowl', 'coral'], ['admin.zones.index', 'Zones', 'zones.edit', 'pin', 'pink'], ['admin.kitchens.index', 'Kitchens', 'zones.edit', 'store', 'green']]],
+      ['Catalogue & areas', [['admin.dishes.index', 'Dishes', 'menu.edit', 'bowl', 'coral'], ['admin.zones.index', 'Zones', 'zones.edit', 'pin', 'pink'], ['admin.branches.index', 'Branches', 'zones.edit', 'store', 'green']]],
       ['Marketing', [['admin.banners.index', 'Banners & popups', 'mkt.banners', 'image', 'purple'], ['admin.offers.index', 'Offers', 'mkt.banners', 'tag', 'pink']]],
       ['Money', [['admin.expenses.index', 'Purchases & expenses', 'expenses.edit', 'cart', 'amber'], ['admin.reports', 'Reports', 'fin.reports', 'chart', 'sky'], ['admin.salaries', 'Salaries & payroll', 'staff.salary', 'wallet', 'green']]],
       ['Team & settings', [['admin.staff.index', 'Staff', 'staff.manage', 'users', 'blue'], ['admin.roles.index', 'Roles & permissions', 'staff.roles', 'shield', 'purple'], ['admin.settings.index', 'Integrations', 'settings.manage', 'plug', 'sky'], ['admin.system', 'System & updates', 'settings.manage', 'cog', 'grey']]],
@@ -52,7 +52,7 @@
       @endif
     @endforeach
     @if($u->hasPermission('kitchen.board') && $myKitchens->count())
-      <div class="grp">Kitchen boards</div>
+      <div class="grp">Branch kitchen boards</div>
       @foreach($myKitchens as $k)
         <a href="{{ route('admin.kitchen', $k) }}" class="{{ request()->is('admin/kitchen/'.$k->id) ? 'on' : '' }}"><span class="ico i-coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ic['flame'] !!}</svg></span>{{ $k->name }}</a>
       @endforeach

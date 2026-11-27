@@ -13,14 +13,20 @@ class ServiceabilityService
         return Zone::whereIn('status', ['live', 'testing'])->get()->first(fn (Zone $z) => $z->contains($lat, $lng));
     }
 
-    /** Open kitchens that serve the point, nearest first, each with distance_m. */
+    /** Every live/testing zone the point falls in (zones of different branches may overlap). */
+    public function zonesFor(float $lat, float $lng): Collection
+    {
+        return Zone::whereIn('status', ['live', 'testing'])->get()->filter(fn (Zone $z) => $z->contains($lat, $lng))->values();
+    }
+
+    /** Open branches that serve the point through any of its zones, nearest first, each with distance_m. */
     public function kitchensFor(float $lat, float $lng): Collection
     {
-        $zone = $this->zoneFor($lat, $lng);
-        if (! $zone) {
+        $zoneIds = $this->zonesFor($lat, $lng)->pluck('id');
+        if ($zoneIds->isEmpty()) {
             return collect();
         }
-        return $zone->kitchens()->where('is_open', true)->get()
+        return Kitchen::where('is_open', true)->whereHas('zones', fn ($q) => $q->whereIn('zones.id', $zoneIds))->get()
             ->map(function (Kitchen $k) use ($lat, $lng) {
                 $k->distance_m = (int) $this->distance($lat, $lng, $k->lat, $k->lng);
                 return $k;

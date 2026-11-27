@@ -39,7 +39,7 @@ class StaffController extends CrudController
             'email' => ['label' => 'Work email (web login)', 'rules' => 'nullable|email|unique:users,email'.($item ? ','.$item->id : '')],
             'phone' => ['label' => 'Mobile (app login)', 'rules' => ['nullable', 'regex:/^[6-9]\d{9}$/', 'unique:users,phone'.($item ? ','.$item->id : '')]],
             'role_id' => ['label' => 'Role', 'type' => 'select', 'options' => Role::where('is_staff', true)->pluck('name', 'id')->all(), 'rules' => 'required|exists:roles,id'],
-            'kitchen_ids' => ['label' => 'Kitchens they work in', 'type' => 'multiselect', 'options' => Kitchen::pluck('name', 'id')->all(), 'value' => $item?->kitchens()->pluck('kitchens.id')->all() ?? [], 'rules' => 'nullable|array'],
+            'kitchen_ids' => ['label' => 'Branches they work in', 'type' => 'multiselect', 'options' => Kitchen::pluck('name', 'id')->all(), 'value' => $item?->kitchens()->pluck('kitchens.id')->all() ?? [], 'rules' => 'nullable|array'],
             'password' => ['label' => $item ? 'New password (leave blank to keep)' : 'Password', 'type' => 'password', 'rules' => ($item ? 'nullable' : 'required_with:email|nullable').'|min:10'],
             'pos_pin' => ['label' => 'POS PIN (4–6 digits)', 'type' => 'password', 'rules' => 'nullable|digits_between:4,6'],
             'is_active' => ['label' => 'Active', 'type' => 'checkbox'],
