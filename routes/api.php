@@ -25,6 +25,11 @@ Route::prefix('v1')->group(function () {
         Route::get('me/notifications', [Api\MeController::class, 'notificationPrefs']);
         Route::put('me/notifications', [Api\MeController::class, 'saveNotificationPrefs']);
         Route::post('me/devices', [Api\MeController::class, 'registerDevice']);
+        Route::get('me/coach/status', [Api\CoachController::class, 'status']);
+        Route::put('me/coach/consent', [Api\CoachController::class, 'consent']);
+        Route::put('me/wellness', [Api\CoachController::class, 'sync'])->middleware('throttle:30,1');
+        Route::get('me/coach', [Api\CoachController::class, 'show'])->middleware('throttle:30,1');
+        Route::get('me/coach/foods', [Api\CoachController::class, 'foods'])->middleware('throttle:30,1');
 
         Route::get('addresses', [Api\AddressController::class, 'index']);
         Route::post('addresses', [Api\AddressController::class, 'store']);

@@ -28,6 +28,7 @@ class MeController extends Controller
             'wallet' => ['balance_paise' => $w->balance_paise, 'low' => $w->isLow()],
             'points' => $user->pointsBalance(),
             'has_health_profile' => (bool) $user->healthProfile,
+            'coach_on' => (bool) $user->coach_consent_at,
         ];
     }
 
@@ -129,6 +130,7 @@ class MeController extends Controller
         $u = $r->user();
         $u->tokens()->delete();
         $u->healthProfile()?->delete();
+        $u->wellnessDays()->delete();
         $u->forceFill(['name' => 'Deleted user', 'email' => null, 'google_id' => null, 'is_active' => false])->save();
         $u->delete(); // soft delete keeps invoices and payments for legal retention
         return response()->json(['ok' => true]);

@@ -5,6 +5,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Btn, Glass, H2, Muted, Rise, Segmented, Toggle } from '../shared/ui';
 import { C } from '../shared/theme';
 import { Header, Screen } from './_Screen';
+import { useAuth } from '../auth';
+import { syncWellness } from '../wellness';
 import { addGlass, DEFAULTS, fmtTime, getLog, getSettings, processLastResponse, saveSettings, slots, todayKey, WATER_EVENT } from '../water';
 
 const BLUE = '#2F80ED';
@@ -28,6 +30,7 @@ function Ring({ value, goal, size = 190 }) {
 }
 
 export default function WaterScreen({ navigation }) {
+  const { user } = useAuth();
   const [s, setS] = useState(DEFAULTS);
   const [log, setLog] = useState({});
   const [saving, setSaving] = useState(false);
@@ -44,7 +47,7 @@ export default function WaterScreen({ navigation }) {
   }, []);
 
   const today = log[todayKey()] || 0;
-  const change = async (n) => setLog(await addGlass(n));
+  const change = async (n) => { setLog(await addGlass(n)); syncWellness(user); };
   const update = async (patch) => {
     const next = { ...s, ...patch };
     if (next.end <= next.start) next.end = Math.min(23, next.start + 1);
@@ -126,6 +129,7 @@ export default function WaterScreen({ navigation }) {
         </Glass>
       </Rise>
 
+      <Btn kind="ghost" title={user?.coach_on ? '🤖 See your coach’s tips' : '🤖 Get smart tips from the wellness coach'} onPress={() => navigation.navigate('Coach')} />
       <Muted style={{ fontSize: 12, textAlign: 'center', paddingHorizontal: 8 }}>General guidance only. If your doctor has asked you to limit fluids, follow their advice and keep reminders off.</Muted>
     </Screen>
   );

@@ -11,6 +11,8 @@ import { Screen } from './_Screen';
 import { useAuth } from '../auth';
 import { useCart } from '../cart';
 import { addGlass, getLog, getSettings, todayKey, WATER_EVENT } from '../water';
+import { getLog as getWorkoutLog, getSettings as getWorkoutSettings, minutesOn, streak as workoutStreak, WORKOUT_EVENT } from '../workout';
+import { getCoach, syncWellness } from '../wellness';
 
 const W = Dimensions.get('window').width - 40;
 export const PARTS = (diet) => [['grains', 'Grains', C.grains], ['protein', diet === 'veg' ? 'Dal & sambar' : 'Protein', C.protein], ['veg', 'Vegetables', C.veg], ['dairy', 'Curd', C.dairy]];
@@ -98,6 +100,49 @@ function WaterCard({ onOpen }) {
           <Text style={{ fontSize: 12, color: '#405A54' }}>{on ? 'Reminders on · phone and watch' : 'Tap to turn on reminders'}</Text>
         </View>
         <Pressable onPress={plus} hitSlop={8} accessibilityRole="button" accessibilityLabel="Add a glass of water" style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(47,128,237,0.12)', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 22, fontWeight: '800', color: '#2F80ED' }}>+</Text></Pressable>
+      </Glass>
+    </Pressable>
+  );
+}
+
+/** Today's workout minutes and streak. */
+function WorkoutCard({ onOpen }) {
+  const [m, setM] = useState(0); const [goal, setGoal] = useState(30); const [st, setSt] = useState(0);
+  const read = useCallback(async () => { const [l, s] = await Promise.all([getWorkoutLog(), getWorkoutSettings()]); setM(minutesOn(l, todayKey())); setGoal(s.goal); setSt(workoutStreak(l)); }, []);
+  useFocusEffect(useCallback(() => { read(); }, [read]));
+  useEffect(() => { const sub = DeviceEventEmitter.addListener(WORKOUT_EVENT, read); return () => sub.remove(); }, [read]);
+  return (
+    <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={`Workout: ${m} of ${goal} minutes today, ${st} day streak`}>
+      <Glass style={{ flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 22, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1.5, borderColor: 'rgba(242,113,28,0.45)' }}>
+        <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: '#F2711C', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 22 }}>🏃</Text></View>
+        <View style={{ flex: 1, gap: 6 }}>
+          <Text style={{ fontWeight: '800', fontSize: 14, color: C.ink }}>{m >= goal ? `Workout done · ${m} min 🎉` : `${m} of ${goal} active minutes`}</Text>
+          <View style={{ height: 6, borderRadius: 3, backgroundColor: 'rgba(242,113,28,0.15)', overflow: 'hidden' }}><View style={{ width: `${Math.min(100, (m / goal) * 100)}%`, height: 6, backgroundColor: '#F2711C' }} /></View>
+          <Text style={{ fontSize: 12, color: '#405A54' }}>{st > 0 ? `🔥 ${st}-day streak · keep it going` : 'Move 10 minutes today to start a streak'}</Text>
+        </View>
+        <Text style={{ fontSize: 22, color: '#F2711C', fontWeight: '800' }}>›</Text>
+      </Glass>
+    </Pressable>
+  );
+}
+
+/** The coach's top tip for today (or an invitation to switch it on). */
+function CoachCard({ user, kitchenId, onOpen }) {
+  const [tip, setTip] = useState(null);
+  useFocusEffect(useCallback(() => {
+    if (!user?.coach_on) { setTip(null); return; }
+    (async () => { try { await syncWellness(user); const c = await getCoach(kitchenId); setTip(c.insights?.find((x) => x.tone === 'warn') || c.insights?.[0] || null); } catch (e) {} })();
+  }, [user?.coach_on, kitchenId]));
+  const warn = tip?.tone === 'warn';
+  return (
+    <Pressable onPress={onOpen} accessibilityRole="button">
+      <Glass style={{ flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 22, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1.5, borderColor: warn ? 'rgba(242,113,28,0.5)' : 'rgba(31,138,76,0.45)' }}>
+        <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: '#1F8A4C', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 22 }}>🤖</Text></View>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text style={{ fontWeight: '800', fontSize: 14, color: C.ink }}>{user?.coach_on ? (tip ? `${tip.icon} ${tip.title}` : 'Your wellness coach') : 'Meet your wellness coach'}</Text>
+          <Text style={{ fontSize: 12, color: '#405A54' }} numberOfLines={2}>{user?.coach_on ? (tip?.text || 'Log water and workouts to get daily tips.') : 'Water, workout and food tips that learn from your day.'}</Text>
+        </View>
+        <Text style={{ fontSize: 22, color: '#1F8A4C', fontWeight: '800' }}>›</Text>
       </Glass>
     </Pressable>
   );
@@ -256,7 +301,12 @@ export default function HomeScreen({ navigation }) {
         </Rise>
       ) : null}
 
-      <Rise index={5}><WaterCard onOpen={() => navigation.navigate('Water')} /></Rise>
+      <Rise index={5} style={{ gap: 10 }}>
+        <H2 style={{ fontSize: 18 }}>Your wellness today</H2>
+        <CoachCard user={user} kitchenId={cart.kitchenId} onOpen={() => navigation.navigate('Coach')} />
+        <WaterCard onOpen={() => navigation.navigate('Water')} />
+        <WorkoutCard onOpen={() => navigation.navigate('Workout')} />
+      </Rise>
 
       <Modal transparent visible={!!popup} animationType="fade" onRequestClose={() => setPopup(null)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(10,30,25,0.45)', alignItems: 'center', justifyContent: 'center', padding: 28 }}>

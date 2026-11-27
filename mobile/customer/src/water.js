@@ -56,7 +56,38 @@ export async function addGlass(n = 1) {
   const keep = Object.keys(log).sort().slice(-14);
   const trimmed = Object.fromEntries(keep.map((d) => [d, log[d]]));
   await write(K_LOG, trimmed);
+  scheduleCatchUp(trimmed).catch(() => {});
   return trimmed;
+}
+
+/**
+ * Smart nudges: two checkpoints today (3:30 PM and 7 PM). Each is scheduled only if, at that time,
+ * the glasses logged so far would still be behind the goal, and says exactly how far behind.
+ * Rescheduled every time a glass is added, so they disappear once the customer catches up.
+ */
+export async function scheduleCatchUp(log) {
+  const s = await getSettings();
+  const ids = ['water-catch-1', 'water-catch-2'];
+  await Promise.all(ids.map((id) => Notifications.cancelScheduledNotificationAsync(id).catch(() => {})));
+  if (!s.enabled) return;
+  const count = (log || (await getLog()))[todayKey()] || 0;
+  const checks = [[15, 30, Math.ceil(s.goal * 0.55)], [19, 0, Math.ceil(s.goal * 0.85)]];
+  const now = new Date();
+  for (let i = 0; i < checks.length; i++) {
+    const [h, m, target] = checks[i];
+    const at = new Date(); at.setHours(h, m, 0, 0);
+    if (at <= now || count >= target) continue;
+    const need = target - count;
+    await Notifications.scheduleNotificationAsync({
+      identifier: ids[i],
+      content: {
+        title: `💧 You're behind on water: ${count} of ${s.goal} glasses`,
+        body: `Drink ${need} more ${need === 1 ? 'glass' : 'glasses'} now to stay on track today. Buttermilk and fruit count too!`,
+        categoryIdentifier: CATEGORY, data: { kind: 'water' }, sound: 'default',
+      },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: at, channelId: CHANNEL },
+    });
+  }
 }
 
 /** Reminder times (minutes after midnight) between start and end hours, every `every` minutes. */
@@ -116,6 +147,7 @@ export async function saveSettings(next) {
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DAILY, hour: Math.floor(times[i] / 60), minute: times[i] % 60, channelId: CHANNEL },
     });
   }
+  await scheduleCatchUp();
   return true;
 }
 

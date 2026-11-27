@@ -21,7 +21,7 @@
   <div class="s-wrap">
     <a href="{{ route('home') }}" class="s-logo">@include('partials.brand-mark', ['size' => 40])</a>
     <nav class="s-nav" aria-label="Main">
-      <a href="{{ route('home') }}#idea">The idea</a><a href="{{ route('home') }}#plate">Healthy plate</a><a href="{{ route('home') }}#dietitian">Dietitian</a><a href="{{ route('home') }}#how">How it works</a><a href="{{ route('home') }}#app">The app</a><a href="{{ route('home') }}#areas">Areas</a><a href="{{ route('home') }}#faq">FAQ</a>
+      <a href="{{ route('home') }}#idea">The idea</a><a href="{{ route('home') }}#plate">Healthy plate</a><a href="{{ route('home') }}#dietitian">Dietitian</a><a href="{{ route('home') }}#wellness">Wellness</a><a href="{{ route('home') }}#how">How it works</a><a href="{{ route('home') }}#app">The app</a><a href="{{ route('home') }}#areas">Areas</a><a href="{{ route('home') }}#faq">FAQ</a>
     </nav>
     <div class="s-actions">
       <a href="{{ route('login') }}" class="s-btn line" style="height:44px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Log in</a>

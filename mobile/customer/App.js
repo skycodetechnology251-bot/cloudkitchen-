@@ -26,7 +26,9 @@ import AddressesScreen from './src/screens/AddressesScreen';
 import AddressFormScreen from './src/screens/AddressFormScreen';
 import NotificationsScreen from './src/screens/NotificationsScreen';
 import WaterScreen from './src/screens/WaterScreen';
-import { listenWater, processLastResponse, setupWater } from './src/water';
+import { startWellness } from './src/wellness';
+import WorkoutScreen from './src/screens/WorkoutScreen';
+import CoachScreen from './src/screens/CoachScreen';
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -72,6 +74,8 @@ function Root() {
           <Stack.Screen name="HealthEdit" component={HealthScreen} />
           <Stack.Screen name="Notifications" component={NotificationsScreen} />
           <Stack.Screen name="Water" component={WaterScreen} />
+          <Stack.Screen name="Workout" component={WorkoutScreen} />
+          <Stack.Screen name="Coach" component={CoachScreen} />
         </>
       )}
     </Stack.Navigator>
@@ -79,7 +83,7 @@ function Root() {
 }
 
 export default function App() {
-  useEffect(() => { setupWater(); processLastResponse(); return listenWater(); }, []);
+  useEffect(() => startWellness(), []);
   return (
     <SafeAreaProvider>
       <AuthProvider>

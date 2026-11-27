@@ -26,6 +26,8 @@
     ['How does the wallet work?', 'Top up any amount from ₹100 by UPI or card. Each lunch is paid from the wallet first; if it runs short, the rest goes to UPI or card. The app shows how many lunches your balance covers and reminds you before it runs low. Refunds can come back to the wallet instantly.', '#F4B400'],
     ['Who is the dietitian and what do they do?', 'The dietitian on our team reviews every recipe before it is marked “Dietitian-reviewed”: ingredients, portion, calories, protein, carbs, fat, fibre, salt and allergens. They also mark which dishes suit needs like diabetes or high blood pressure. If a recipe changes, it is reviewed again.', '#8CC63F'],
     ['Will the dietitian give me personal medical advice?', 'No. The dietitian reviews our recipes and the suggestions in the app so you can choose balanced meals. For any health condition, please follow your own doctor\'s advice.', '#1F8A4C'],
+    ['How does the wellness coach work?', 'In the app, log glasses of water and your workouts (or tap the buttons on the reminders). If you switch the coach on, it looks at your last two weeks, tells you when you are behind on water, motivates your daily workout and suggests dishes from the menu for before and after exercise. It is off until you turn it on, and turning it off deletes that data.', '#2F80ED'],
+    ['Do the reminders work on my smartwatch?', 'Yes. Water and workout reminders appear on Wear OS watches (Galaxy Watch, Pixel Watch and others) and on Apple Watch, with buttons to log a glass or a 20-minute workout right from your wrist.', '#F2711C'],
     ['Do I get a GST invoice?', 'Yes. Every paid order gets a proper GST invoice in the app, and the counter gives a printed receipt.', '#9C2A6B'],
     ['Is there an iPhone app?', $seo['ios_url'] ? 'Yes. Daily Table is on the App Store and Google Play.' : "We're starting with Android. iPhone is planned for a later release.", '#8CC63F'],
   ];
@@ -140,6 +142,42 @@
         <div class="fs"><i style="background:linear-gradient(135deg,var(--lime),var(--leaf))">2</i><div><h3>The menu highlights what fits you</h3><p>Dishes the dietitian reviewed as suitable for <b>all</b> your health needs are marked “Fits your preferences”. Anything with one of your allergens is flagged before you add it.</p></div></div>
         <div class="fs"><i style="background:linear-gradient(135deg,#C04A8C,var(--beet))">3</i><div><h3>Your details stay private</h3><p>Only our dietitian and doctor can see the health details you share. Kitchen staff, riders and cashiers never do, and they never appear in notifications or on food labels.</p></div></div>
         <div class="fs" style="background:var(--turmeric-l);border-color:#F6DE9A"><i style="background:var(--turmeric)">!</i><div><h3>Good food, not medical treatment</h3><p>Our dietitian's reviews help you choose balanced meals. They are not medical advice — please follow your own doctor's guidance for any health condition.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{-- WELLNESS COACH --}}
+<section class="s-sec" id="wellness" style="background:#fff">
+  <div class="s-wrap">
+    <div class="well">
+      <div>
+        <span class="s-kicker k-carrot">🤖 New · wellness coach</span>
+        <h2 class="s-h2">Water, workout and food — your coach learns your day</h2>
+        <p class="s-lead">The Daily Table app now helps you drink enough water and move every day. Switch on the coach and it looks at how much you drink and how often you work out, then nudges you at the right time and picks dishes from the menu that suit your day.</p>
+        <div class="well-cards">
+          <div class="wc water"><span class="e">💧</span><h3>Drink more water</h3><p>Count glasses towards your daily goal and get reminders between the hours you choose. Falling behind? The app tells you exactly how many glasses to drink now.</p></div>
+          <div class="wc work"><span class="e">🔥</span><h3>Work out every day</h3><p>Log walks, yoga, gym, cycling or home workouts, keep your streak, get a simple idea for each day of the week and one motivating reminder.</p></div>
+          <div class="wc coach"><span class="e">🍛</span><h3>Eat for your workout</h3><p>The coach suggests dishes from today's menu: light energy before you exercise, protein after, and hydrating dishes on days you drink less.</p></div>
+        </div>
+        <div class="watchline">
+          <span>⌚ Works with Wear OS watches</span><span>⌚ Works with Apple Watch</span><span>🔒 Coach is off until you switch it on</span>
+        </div>
+        <p style="margin:16px 0 0;font-size:14px;color:var(--soft);line-height:1.6">Reminders show on your watch with <b>“I drank a glass”</b> and <b>“Did 20 min”</b> buttons. The coach uses only your daily glass count and workout minutes — never your health conditions, name or phone number — and you can switch it off any time, which deletes that data. Tips are for everyday wellbeing, not medical advice.</p>
+      </div>
+      <div>
+        <div class="mock" aria-hidden="true"><div class="mock-in">
+          <h4>Your wellness today</h4>
+          <div class="mtip"><b style="display:block;font-size:13px;margin-bottom:2px">💧 Time to catch up on water</b>You're at 3 of 8 glasses; by now you'd usually be near 5. Drink 2 glasses in the next hour.</div>
+          <div class="mc"><i style="background:#2F80ED">💧</i><div style="flex:1"><b>3 of 8 glasses of water</b><small>Reminders on · phone and watch</small><div class="mbar"><span style="width:37%;background:#2F80ED"></span></div></div></div>
+          <div class="mc"><i style="background:#F2711C">🏃</i><div style="flex:1"><b>20 of 30 active minutes</b><small>🔥 4-day streak · keep it going</small><div class="mbar" style="background:rgba(242,113,28,.15)"><span style="width:66%;background:#F2711C"></span></div></div></div>
+          <div class="mc" style="align-items:flex-start"><i style="background:#1F8A4C">🤖</i><div><b>From your coach</b><small>Nice walk this morning! Refuel with a protein-rich lunch and add a glass of buttermilk — you're a little behind on water today.</small></div></div>
+          <h4 style="font-size:14px">🍛 After your workout</h4>
+          <div class="mfood"><div><b>Egg curry rice</b>22 g protein for recovery</div><div><b>Millet meals</b>18 g protein</div></div>
+          <h4 style="font-size:14px">💧 Hydrating dishes</h4>
+          <div class="mfood"><div style="border-color:#2F80ED55"><b>Neer mor</b>Adds water to your day</div><div style="border-color:#2F80ED55"><b>Fruit cup</b>Fresh and hydrating</div></div>
+        </div></div>
+        <p style="text-align:center;font-size:12px;color:var(--soft);margin:12px 0 0">Example screen from the Daily Table app</p>
       </div>
     </div>
   </div>

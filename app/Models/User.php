@@ -22,6 +22,7 @@ class User extends Authenticatable
     {
         return [
             'phone_verified_at' => 'datetime',
+            'coach_consent_at' => 'datetime',
             'email_verified_at' => 'datetime',
             'joined_on' => 'date',
             'last_seen_at' => 'datetime',
@@ -34,6 +35,7 @@ class User extends Authenticatable
 
     public function role() { return $this->belongsTo(Role::class); }
     public function healthProfile() { return $this->hasOne(HealthProfile::class); }
+    public function wellnessDays() { return $this->hasMany(WellnessDay::class); }
     public function addresses() { return $this->hasMany(Address::class)->whereNull('archived_at'); }
     public function wallet() { return $this->hasOne(Wallet::class); }
     public function orders() { return $this->hasMany(Order::class); }
