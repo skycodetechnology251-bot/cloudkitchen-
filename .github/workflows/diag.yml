@@ -15,6 +15,7 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
+      - uses: actions/checkout@v5
       - name: Get APKs
         run: |
           git init -q apks && cd apks
@@ -28,7 +29,7 @@ jobs:
           target: google_apis
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: bash -c 'mkdir -p out; for p in "in.dailytable.app:daily-table-customer.apk" "in.dailytable.rider:daily-table-rider.apk"; do pkg=${p%%:*}; apk=${p##*:}; adb install -r -g apks/$apk > out/$pkg-install.txt 2>&1; adb logcat -c; adb shell monkey -p $pkg -c android.intent.category.LAUNCHER 1 > /dev/null 2>&1; sleep 25; echo "pid: $(adb shell pidof $pkg)" > out/$pkg-status.txt; adb shell dumpsys activity activities | grep -i "mResumedActivity\|topResumedActivity" >> out/$pkg-status.txt; adb logcat -d -v time > out/$pkg-logcat-full.txt; grep -E "AndroidRuntime|FATAL|ReactNativeJS|ReactNative|Expo|expo|Error|Exception|$pkg" out/$pkg-logcat-full.txt | grep -v "chatty" | tail -400 > out/$pkg-logcat.txt; adb exec-out screencap -p > out/$pkg-screen.png; done; ls -la out'
+          script: bash diag.sh
       - name: Save results
         if: always()
         run: |
