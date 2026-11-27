@@ -1,4 +1,4 @@
-# Diagnostics: install the published APKs on an Android emulator, open them, and save the crash log.
+# Diagnostics only: build each app for the emulator (x86_64), open it, and save the crash log.
 name: Crash test
 on:
   push:
@@ -8,19 +8,43 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: customer
+            pkg: in.dailytable.app
+          - app: rider
+            pkg: in.dailytable.rider
     steps:
+      - uses: actions/checkout@v5
+        with:
+          path: diag
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+          path: src
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Build for the emulator
+        working-directory: src/mobile/${{ matrix.app }}
+        run: |
+          npm install --no-audit --no-fund
+          npx expo install --fix
+          npx expo prebuild --platform android --no-install --clean
+          cd android && ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=x86_64
+          cp app/build/outputs/apk/release/app-release.apk $GITHUB_WORKSPACE/test.apk
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - uses: actions/checkout@v5
-      - name: Get APKs
-        run: |
-          git init -q apks && cd apks
-          git fetch -q --depth 1 "https://github.com/${{ github.repository }}.git" apk
-          git checkout -q FETCH_HEAD && ls -la
       - name: Run on emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -29,10 +53,10 @@ jobs:
           target: google_apis
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: bash diag.sh
+          script: bash diag/diag.sh ${{ matrix.pkg }} test.apk
       - name: Save results
         if: always()
         run: |
-          mkdir -p res && cp -r out/* res/ 2>/dev/null || true
-          cd res && git init -q -b diag-logs && git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A && git commit -q -m "crash test ${{ github.run_id }}" && git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" diag-logs
+          mkdir -p res && cp -r out/* res/ 2>/dev/null || echo "no output" > res/none.txt
+          cd res && git init -q -b diag-${{ matrix.app }} && git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -q -m "crash test ${{ github.run_id }}" && git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" diag-${{ matrix.app }}
