@@ -8,6 +8,7 @@ use App\Services\GoogleAuthService;
 use App\Services\OtpService;
 use App\Services\PointsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -66,6 +67,53 @@ class AuthController extends Controller
             // Mobile number is required for delivery: app must finish with OTP.
             return response()->json(['needs_phone' => true, 'google_link_token' => encrypt($claims['sub']), 'name' => $user->name]);
         }
+        return $this->session($user, $data['device'] ?? 'app', false);
+    }
+
+    /** New customer with email + password (used when SMS/OTP is not switched on). */
+    public function emailRegister(Request $r, PointsService $points)
+    {
+        $data = $r->validate([
+            'name' => 'required|string|min:2|max:80',
+            'email' => 'required|email|max:120',
+            'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
+            'password' => 'required|string|min:8|max:100|confirmed',
+            'device' => ['nullable', 'string', 'max:60'],
+        ], [
+            'phone.regex' => 'Enter your 10-digit mobile number (for delivery).',
+            'password.min' => 'Use at least 8 characters for your password.',
+            'password.confirmed' => 'The two passwords do not match.',
+        ]);
+        $email = strtolower(trim($data['email']));
+        if (User::where('email', $email)->exists()) {
+            throw ValidationException::withMessages(['email' => 'This email already has an account. Please log in.']);
+        }
+        if (User::where('phone', $data['phone'])->exists()) {
+            throw ValidationException::withMessages(['phone' => 'This mobile number already has an account. Log in with its email, or contact support.']);
+        }
+        $user = User::create(['name' => trim($data['name']), 'email' => $email, 'phone' => $data['phone']]);
+        $user->forceFill(['password' => $data['password'], 'last_seen_at' => now()])->save();
+        $user->walletOrCreate();
+        $points->award($user, config('dailytable.points.bonus.signup'), 'signup');
+
+        return $this->session($user, $data['device'] ?? 'app', true);
+    }
+
+    public function emailLogin(Request $r)
+    {
+        $data = $r->validate(['email' => 'required|email', 'password' => 'required|string', 'device' => ['nullable', 'string', 'max:60']]);
+        $user = User::where('email', strtolower(trim($data['email'])))->first();
+        if (! $user || ! $user->password || ! Hash::check($data['password'], $user->password)) {
+            throw ValidationException::withMessages(['email' => 'Wrong email or password.']);
+        }
+        if ($user->isStaff()) {
+            throw ValidationException::withMessages(['email' => 'This is a staff account. Please use the staff login on the website.']);
+        }
+        if (! $user->is_active) {
+            throw ValidationException::withMessages(['email' => 'This account is disabled. Contact support.']);
+        }
+        $user->forceFill(['last_seen_at' => now()])->save();
+
         return $this->session($user, $data['device'] ?? 'app', false);
     }
 

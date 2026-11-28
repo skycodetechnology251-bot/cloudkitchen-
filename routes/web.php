@@ -68,6 +68,11 @@ Route::middleware(['auth', 'role:admin,ops,kitchen_manager,kitchen_staff,cashier
     });
     Route::post('orders/{order}/refund', [Admin\OrderController::class, 'refund'])->middleware('perm:orders.refund')->name('orders.refund');
     Route::middleware('perm:staff.manage')->resource('staff', Admin\StaffController::class)->except('show');
+    Route::middleware('perm:staff.manage')->group(function () {
+        Route::get('dietitians', [Admin\DietitianAccountController::class, 'index'])->name('dietitians.index');
+        Route::post('dietitians', [Admin\DietitianAccountController::class, 'store'])->name('dietitians.store');
+        Route::put('dietitians/{user}', [Admin\DietitianAccountController::class, 'update'])->name('dietitians.update');
+    });
     Route::middleware('perm:staff.salary')->group(function () {
         Route::get('salaries', [Admin\SalaryController::class, 'index'])->name('salaries');
         Route::put('salaries/roles/{role}', [Admin\SalaryController::class, 'updateRole'])->name('salaries.role');

@@ -10,10 +10,16 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/otp/request', [Api\AuthController::class, 'requestOtp'])->middleware('throttle:10,1');
     Route::post('auth/otp/verify', [Api\AuthController::class, 'verifyOtp'])->middleware('throttle:20,1');
     Route::post('auth/google', [Api\AuthController::class, 'google'])->middleware('throttle:20,1');
+    // Email + password sign-up and log-in: the app uses these while SMS (OTP) is not set up.
+    Route::post('auth/email/register', [Api\AuthController::class, 'emailRegister'])->middleware('throttle:10,1');
+    Route::post('auth/email/login', [Api\AuthController::class, 'emailLogin'])->middleware('throttle:10,1');
     Route::get('banners', [Api\CatalogueController::class, 'banners']);
-    Route::get('app/login-screen', fn () => response()->json(collect(\App\Support\Brand::loginScreen())->except('paths')->all() + ['brand' => \App\Support\Brand::name(), 'logo' => \App\Support\Brand::logoAbsoluteUrl()])->header('Cache-Control', 'public, max-age=120'));
+    Route::get('app/login-screen', fn () => response()->json(collect(\App\Support\Brand::loginScreen())->except('paths')->all() + ['brand' => \App\Support\Brand::name(), 'logo' => \App\Support\Brand::logoAbsoluteUrl(), 'sms' => (bool) \App\Services\Messaging\SmsGateway::active()])->header('Cache-Control', 'public, max-age=60'));
     Route::post('serviceability', [Api\CatalogueController::class, 'serviceability']);
     Route::get('dishes/{dish:slug}', [Api\CatalogueController::class, 'dish']);
+    // Menus are public so guests can look around before signing in.
+    Route::get('menu', [Api\CatalogueController::class, 'menu'])->middleware('throttle:60,1');
+    Route::get('meals', [Api\CatalogueController::class, 'meals'])->middleware('throttle:60,1');
     Route::post('webhooks/razorpay', [Api\CheckoutController::class, 'webhook']);
 
     Route::middleware('auth:sanctum')->group(function () {
@@ -38,8 +44,6 @@ Route::prefix('v1')->group(function () {
         Route::delete('addresses/{address}', [Api\AddressController::class, 'destroy']);
         Route::post('addresses/detect', [Api\AddressController::class, 'detect']);
 
-        Route::get('menu', [Api\CatalogueController::class, 'menu']);
-        Route::get('meals', [Api\CatalogueController::class, 'meals']);
         Route::post('meal-responses', [Api\CatalogueController::class, 'mealResponse']);
         Route::post('banners/{banner}/tap', [Api\CatalogueController::class, 'bannerTap']);
 

@@ -32,6 +32,7 @@ async function registerPush() {
 export function AuthProvider({ children }) {
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState(null);
+  const [guest, setGuest] = useState(false); // "Skip" on the login screen: browse without an account
 
   const refresh = useCallback(async () => {
     try { setUser(await api('/me')); } catch (e) { if (e.status === 401) { await saveToken(null); setUser(null); } }
@@ -39,8 +40,11 @@ export function AuthProvider({ children }) {
 
   useEffect(() => { (async () => { if (await loadToken()) await refresh(); setReady(true); })(); }, [refresh]);
 
-  const signIn = useCallback(async ({ token, user: u }) => { await saveToken(token); setUser(u); registerPush(); }, []);
+  const signIn = useCallback(async ({ token, user: u }) => { await saveToken(token); setGuest(false); setUser(u); registerPush(); }, []);
+  const skip = useCallback(() => setGuest(true), []);
+  /** From guest mode back to the login screen (basket is kept). */
+  const askLogin = useCallback(() => setGuest(false), []);
   const signOut = useCallback(async () => { try { await api('/auth/logout', { method: 'POST' }); } catch (e) {} await saveToken(null); setUser(null); }, []);
 
-  return <Ctx.Provider value={{ ready, user, setUser, refresh, signIn, signOut }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ ready, user, guest: !user && guest, setUser, refresh, signIn, signOut, skip, askLogin }}>{children}</Ctx.Provider>;
 }

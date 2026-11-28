@@ -17,7 +17,7 @@
   $total = $urgent->count() + $later->count();
   $pct = $active ? round($reviewed->count() / $active * 100) : 0;
 @endphp
-<div class="row between"><div><h1>Dietitian desk</h1><p class="muted" style="margin:4px 0 0">Check each dish's recipe and nutrition, mark which health needs it suits, then approve it. Approved dishes show “Fits your preferences” to customers who shared those needs.</p></div></div>
+<div class="row between"><div><h1>Dietitian desk</h1><p class="muted" style="margin:4px 0 0">Check each dish's recipe and nutrition, mark which health needs it suits, then approve it. Approved dishes show “Fits your preferences” to customers who shared those needs.</p></div>@if(auth()->user()->hasPermission('staff.manage'))<a class="btn" href="{{ route('admin.dietitians.index') }}">👩‍⚕️ Dietitian logins</a>@endif</div>
 
 <div class="grid g4" style="margin-bottom:18px">
   <div class="kpi t-amber"><div class="kpi-label">Waiting for you</div><div class="kpi-value">{{ $total }}</div><div class="kpi-sub">{{ $urgent->count() }} on menus in the next 3 days</div></div>

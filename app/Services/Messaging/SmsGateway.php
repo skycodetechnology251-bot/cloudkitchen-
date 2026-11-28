@@ -12,6 +12,17 @@ use Illuminate\Support\Facades\Log;
  */
 class SmsGateway
 {
+    /** True only when a real SMS provider is set up, so OTP codes can actually reach phones. */
+    public static function active(): bool
+    {
+        $driver = Setting::get('sms', 'driver', env('SMS_DRIVER', 'log'));
+
+        return $driver && $driver !== 'log'
+            && Setting::get('sms', 'api_key', env('SMS_API_KEY'))
+            && Setting::get('sms', 'endpoint', env('SMS_ENDPOINT'))
+            && Setting::get('sms', 'otp_template_id', env('SMS_OTP_TEMPLATE_ID'));
+    }
+
     public function sendOtp(string $phone, string $code): void
     {
         $this->send($phone, Setting::get('sms', 'otp_template_id', env('SMS_OTP_TEMPLATE_ID')), ['otp' => $code]);

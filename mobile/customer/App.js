@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -67,13 +67,48 @@ function MainTabs() {
   );
 }
 
+/** Shown to guests on screens that need an account. */
+function LoginGate({ route }) {
+  const { askLogin } = useAuth();
+  const what = { Orders: 'see your orders', Profile: 'see your profile', Checkout: 'place your order', Wallet: 'use your wallet', Addresses: 'save addresses', AddressForm: 'save addresses', Coach: 'use the wellness coach', Notifications: 'set notifications', HealthEdit: 'save food preferences', Order: 'see your order', Pay: 'pay' }[route.name] || 'continue';
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28, gap: 12, backgroundColor: C.bg }}>
+      <Text style={{ fontSize: 52 }}>🔐</Text>
+      <Text style={{ fontSize: 22, fontWeight: '800', color: C.ink, textAlign: 'center' }}>Log in to {what}</Text>
+      <Text style={{ fontSize: 15, color: C.muted, textAlign: 'center', lineHeight: 22 }}>It takes a few seconds with your mobile number. Your basket stays as it is.</Text>
+      <Pressable accessibilityRole="button" onPress={askLogin} style={{ marginTop: 8, backgroundColor: '#1F8A4C', paddingHorizontal: 28, minHeight: 52, borderRadius: 999, justifyContent: 'center' }}>
+        <Text style={{ color: '#fff', fontWeight: '800', fontSize: 16 }}>Log in or sign up</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+function GuestTabs() {
+  return (
+    <Tabs.Navigator screenOptions={{ headerShown: false }} tabBar={(p) => <GlassTabBar {...p} />}>
+      <Tabs.Screen name="Today" component={HomeScreen} />
+      <Tabs.Screen name="Menu" component={MenuScreen} />
+      <Tabs.Screen name="Orders" component={LoginGate} />
+      <Tabs.Screen name="Profile" component={LoginGate} />
+    </Tabs.Navigator>
+  );
+}
+
 function Root() {
-  const { ready, user } = useAuth();
+  const { ready, user, guest } = useAuth();
   if (!ready) return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: C.teal }}><ActivityIndicator color="#fff" /></View>;
   const needsProfile = user && (user.name === 'New customer' || !user.name);
   return (
     <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right', contentStyle: { backgroundColor: C.bg } }}>
-      {!user ? (
+      {guest ? (
+        <>
+          <Stack.Screen name="Main" component={GuestTabs} />
+          <Stack.Screen name="Dish" component={DishScreen} options={{ animation: 'fade_from_bottom' }} />
+          <Stack.Screen name="Water" component={WaterScreen} />
+          <Stack.Screen name="Workout" component={WorkoutScreen} />
+          {['Checkout', 'Pay', 'Order', 'Wallet', 'Addresses', 'AddressForm', 'HealthEdit', 'Notifications', 'Coach'].map((n) => <Stack.Screen key={n} name={n} component={LoginGate} />)}
+        </>
+      ) : !user ? (
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Otp" component={OtpScreen} />

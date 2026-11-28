@@ -29,10 +29,12 @@ class CatalogueController extends Controller
     /** Today's menu for a kitchen, filtered by the customer's food rules. */
     public function menu(Request $r)
     {
+        // Guests ("Skip" on the app's login) can browse; a signed-in customer also gets their preferences.
+        $user = $r->user() ?? auth('sanctum')->user();
         $d = $r->validate(['kitchen_id' => 'required|exists:kitchens,id', 'date' => 'nullable|date', 'category' => 'nullable|string', 'q' => 'nullable|string|max:60', 'meal' => 'nullable|string|max:20']);
         $meal = Meals::valid($d['meal'] ?? 'lunch');
         $date = $d['date'] ?? $this->nextOrderableDate((int) $d['kitchen_id'], $meal);
-        $profile = $r->user()?->healthProfile;
+        $profile = $user?->healthProfile;
         $menus = DailyMenu::with('dish.category')->where('kitchen_id', $d['kitchen_id'])->whereDate('service_date', $date)->where('meal', $meal)
             ->whereHas('dish', function ($q) use ($profile, $d) {
                 $q->where('is_active', true);
@@ -62,7 +64,7 @@ class CatalogueController extends Controller
             ];
         })->sortByDesc('fits_preferences')->values();
 
-        $response = $r->user() ? MealResponse::where(['user_id' => $r->user()->id, 'meal' => $meal])->whereDate('service_date', $date)->value('response') : null;
+        $response = $user ? MealResponse::where(['user_id' => $user->id, 'meal' => $meal])->whereDate('service_date', $date)->value('response') : null;
         $info = Meals::get($meal);
         return response()->json(['date' => $date, 'meal' => $meal, 'meal_label' => $info['label'], 'slots' => $info['slots'], 'cutoff' => $info['cutoff'], 'items' => $items, 'today_response' => $response]);
     }

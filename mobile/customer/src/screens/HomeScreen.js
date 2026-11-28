@@ -150,7 +150,7 @@ function CoachCard({ user, kitchenId, onOpen }) {
 }
 
 export default function HomeScreen({ navigation }) {
-  const { user, refresh } = useAuth();
+  const { user, refresh, guest, askLogin } = useAuth();
   const cart = useCart();
   const [banners, setBanners] = useState([]);
   const [popup, setPopup] = useState(null);
@@ -197,7 +197,7 @@ export default function HomeScreen({ navigation }) {
    * 4. their default address when location is off.
    */
   const pickAddress = async () => {
-    const list = await api('/addresses');
+    const list = guest ? [] : await api('/addresses');
     let pos = null;
     try {
       let perm = await Location.getForegroundPermissionsAsync();
@@ -209,7 +209,7 @@ export default function HomeScreen({ navigation }) {
     let chosen = null; let isHere = false;
     if (cart.manual) chosen = list.find((a) => a.id === cart.addressId) || null;
     if (!chosen && pos) {
-      try {
+      if (!guest) try {
         const r = await api('/addresses/detect', { method: 'POST', body: { lat: pos.coords.latitude, lng: pos.coords.longitude } });
         if (r.address) { chosen = list.find((a) => a.id === r.address.id) || r.address; isHere = true; }
       } catch (e) {}
@@ -231,13 +231,13 @@ export default function HomeScreen({ navigation }) {
   const load = useCallback(async () => {
     setBusy(true);
     try {
-      const [b, w, p] = await Promise.all([api('/banners', { query: { placement: 'home' } }), api('/wallet'), api('/banners', { query: { placement: 'popup' } })]);
+      const [b, w, p] = await Promise.all([api('/banners', { query: { placement: 'home' } }), guest ? Promise.resolve(null) : api('/wallet').catch(() => null), api('/banners', { query: { placement: 'popup' } })]);
       setBanners(b); setWallet(w);
       if (p[0] && !shown.current) { shown.current = true; setPopup(p[0]); Animated.spring(pop, { toValue: 1, useNativeDriver: true, bounciness: 10 }).start(); }
       await loadMenu(await pickAddress());
-      refresh();
+      if (!guest) refresh();
     } catch (e) {} finally { setBusy(false); }
-  }, [cart.addressId, cart.manual, reload]);
+  }, [cart.addressId, cart.manual, reload, guest]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
   // Moved about 500 m, or came back to the app: re-check the nearest branch (unless an address was picked by hand).
@@ -281,16 +281,20 @@ export default function HomeScreen({ navigation }) {
   return (
     <Screen refreshing={busy} onRefresh={load}>
       <Rise index={0} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: C.mint, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontWeight: '800', fontSize: 17, color: C.ink }}>{(first || '?')[0]}</Text></View>
+        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: C.mint, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontWeight: '800', fontSize: 17, color: C.ink }}>{first ? first[0] : '🙂'}</Text></View>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 18, fontWeight: '800', color: C.ink }} numberOfLines={1}>{hello}, {first}</Text>
+          <Text style={{ fontSize: 18, fontWeight: '800', color: C.ink }} numberOfLines={1}>{hello}{first ? `, ${first}` : ' 👋'}</Text>
           <Pressable onPress={() => navigation.navigate('Addresses', { pick: true })} accessibilityRole="button" accessibilityLabel="Change delivery address" style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }} hitSlop={6}>
             {address ? <Pulse /> : null}
             <Text numberOfLines={1} style={{ fontSize: 13, color: C.muted, fontWeight: '600', flexShrink: 1 }}>{address ? (address.gps ? `📍 Near ${address.area}` : `${address.label} · ${address.area}${here ? " · you're here" : ''}`) : 'Add a delivery address'}</Text>
             <Icon name="chevron" size={14} color={C.muted} />
           </Pressable>
         </View>
-        <IconBtn label="Notifications" onPress={() => navigation.navigate('Notifications')} icon={<Icon name="bell" />} />
+        {guest ? (
+          <Pressable onPress={askLogin} accessibilityRole="button" accessibilityLabel="Log in or sign up" style={{ paddingHorizontal: 16, height: 40, borderRadius: 999, backgroundColor: '#1F8A4C', justifyContent: 'center' }}>
+            <Text style={{ color: '#fff', fontWeight: '800' }}>Log in</Text>
+          </Pressable>
+        ) : <IconBtn label="Notifications" onPress={() => navigation.navigate('Notifications')} icon={<Icon name="bell" />} />}
       </Rise>
 
       {banners.length ? (
