@@ -60,7 +60,8 @@ export default function LoginScreen({ navigation }) {
       });
       setTimeout(fit, Platform.OS === 'android' ? 120 : 0);
     };
-    const onHide = () => { setKb(false); setKbPad(0); };
+    // Keyboard closed: back to the full screen with the photo and Skip button.
+    const onHide = () => { setKb(false); setKbPad(0); setTimeout(() => scrollRef.current?.scrollTo({ y: 0, animated: true }), 30); };
     const show = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', onShow);
     const hide = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', onHide);
     return () => { show.remove(); hide.remove(); };
