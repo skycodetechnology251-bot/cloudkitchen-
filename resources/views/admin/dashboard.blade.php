@@ -12,8 +12,6 @@
   $delivered = $status['delivered'] ?? 0;
   $inKitchen = ($status['confirmed'] ?? 0) + ($status['accepted'] ?? 0) + ($status['preparing'] ?? 0) + ($status['packed'] ?? 0);
   $onWay = $status['picked_up'] ?? 0;
-  $mins = $now->diffInMinutes($cutoff, false);
-  $cutText = $mins > 0 ? 'Orders for today close in '.($mins >= 60 ? intdiv((int) $mins, 60).'h ' : '').((int) $mins % 60).'m (at '.$cutoff->format('g:i A').')' : 'Today\'s ordering closed at '.$cutoff->format('g:i A').' · customers are ordering for tomorrow';
   $tones = ['teal' => ['#1FA67A', '#0F5C4D'], 'blue' => ['#5B8CF5', '#1F4FC2'], 'coral' => ['#F48A5E', '#C9472A'], 'amber' => ['#F2B33D', '#C27407'], 'purple' => ['#9F70F5', '#5B30C0'], 'green' => ['#3CC184', '#167D49'], 'pink' => ['#EE6AA0', '#B8285F'], 'sky' => ['#36B8DE', '#0A7499']];
   $weekMax = max(1, $week->max('sales'));
   $barTones = ['blue', 'purple', 'pink', 'coral', 'amber', 'sky', 'green'];
@@ -72,45 +70,81 @@
   ];
 @endphp
 
-{{-- Hero --}}
-<section class="dash-hero">
-  <div class="row between" style="align-items:flex-start;gap:16px">
+
+{{-- Header: greeting + branch picker --}}
+<section class="dash-hero" style="padding:20px 24px">
+  <div class="row between" style="align-items:center;gap:14px">
     <div>
-      <div class="row" style="gap:8px;margin-bottom:8px">
-        <span class="chip" style="background:rgba(255,255,255,.2);color:#fff">{{ $now->format('l, j F Y') }}</span>
-        <span class="chip" style="background:rgba(255,255,255,.2);color:#fff">Showing: {{ $scope }}</span>
-      </div>
-      <h1>Good {{ $hour < 12 ? 'morning' : ($hour < 17 ? 'afternoon' : 'evening') }}, {{ strtok($u->name, ' ') }} 👋</h1>
-      <p style="margin:6px 0 0;opacity:.9;font-weight:600">⏰ {{ $cutText }}</p>
+      <h1 style="font-size:28px">Good {{ $hour < 12 ? 'morning' : ($hour < 17 ? 'afternoon' : 'evening') }}, {{ strtok($u->name, ' ') }} 👋</h1>
+      <p style="margin:4px 0 0;opacity:.92;font-weight:600">{{ $now->format('l, j F') }} · here is your day at a glance.</p>
     </div>
-    <div class="row" style="gap:8px">
-      @if($u->hasPermission('pos.use'))<a class="btn" href="{{ route('admin.pos.open') }}" style="background:#fff;color:#1F4FC2">Open POS</a>@endif
-      @if($u->hasPermission('menu.publish'))<a class="btn" href="{{ route('admin.menus.index') }}" style="background:rgba(255,255,255,.18);color:#fff">Publish menu</a>@endif
-    </div>
-  </div>
-  <div class="hero-stats">
-    <div class="hero-stat"><b>{{ $rs($today['sales']) }}</b><span>sales today</span></div>
-    <div class="hero-stat"><b>{{ $today['orders'] }}</b><span>paid orders</span></div>
-    <div class="hero-stat"><b>{{ $today['orders'] ? round($delivered / max(1, $today['orders']) * 100) : 0 }}%</b><span>delivered</span></div>
-    <div class="hero-stat"><b>{{ $rs($week->sum('sales')) }}</b><span>last 7 days</span></div>
+    @if($canPickAll)
+      <form method="get" class="dash-pick">
+        <label for="branch" style="font-weight:800;font-size:13px;opacity:.9">Showing</label>
+        <select id="branch" name="branch" onchange="this.form.submit()">
+          @if(auth()->user()->seesAllKitchens() || $allKitchens->count() > 1)<option value="all" @selected(! $branch)>🏪 All branches</option>@endif
+          @foreach($allKitchens as $k)<option value="{{ $k->id }}" @selected($branch?->id === $k->id)>{{ $k->name }}</option>@endforeach
+        </select>
+      </form>
+    @else
+      <span class="chip" style="background:rgba(255,255,255,.22);color:#fff;font-size:14px;padding:8px 14px">🏪 {{ $scope }}</span>
+    @endif
   </div>
 </section>
 
-{{-- KPI cards --}}
-<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:18px">
-  @foreach($kpis as [$label, $value, $delta, $sub, $tone, $icon])
+{{-- 1. What to do --}}
+<section class="panel" style="margin-bottom:18px">
+  <h2 style="font-size:20px">✅ What to do today</h2>
+  <div class="sub">The most important things first. Tap a button to go straight there.</div>
+  @if($todo)
+    <div class="todo">
+      @foreach($todo as $t)
+        <a class="todo-i t-{{ $t['tone'] }}-soft" href="{{ $t['href'] }}"><span class="todo-e">{{ $t['icon'] }}</span><span class="todo-t">{{ $t['text'] }}</span><span class="btn small">{{ $t['cta'] }} →</span></a>
+      @endforeach
+    </div>
+  @else
+    <div class="soft s-green" style="padding:16px;font-weight:700">🎉 All done! Menus are published and nothing is waiting for you.</div>
+  @endif
+</section>
+
+{{-- 2. Today's meals --}}
+<h2 style="font-size:20px;margin:0 0 10px">🍽️ Today's meals</h2>
+<div class="meal-cards" style="margin-bottom:18px">
+  @foreach($meals as $k => $m)
+    <a class="meal-card" href="{{ route('admin.menus.index', ['date' => $now->toDateString(), 'meal' => $k] + ($branch ? ['kitchen' => $branch->id] : [])) }}" style="--mc:{{ $m['color'] }}">
+      <div class="row between" style="flex-wrap:nowrap"><span class="mc-t">{{ $m['icon'] }} {{ $m['label'] }}</span><span class="chip" style="background:{{ $m['closed'] ? '#EEF1F0' : $m['color'].'22' }};color:{{ $m['closed'] ? '#56706A' : $m['color'] }}">{{ $m['closed'] ? 'Orders closed' : 'Open till '.$m['cutoff_at']->format('g:i A') }}</span></div>
+      <div class="mc-n">{{ $m['orders'] }} <small>{{ $m['orders'] === 1 ? 'order' : 'orders' }}</small></div>
+      <div class="mc-bar"><span style="width:{{ $m['orders'] ? round($m['done'] / $m['orders'] * 100) : 0 }}%"></span></div>
+      <div class="small" style="color:#405A54">{{ $m['done'] }} delivered · {{ $m['open'] }} in progress · ₹{{ number_format($m['sales'] / 100) }}</div>
+      <div class="small muted">{{ $m['dishes'] ? $m['dishes'].' dishes on today’s menu' : 'No menu today' }} · delivery {{ str_replace('-', '–', $m['slots'][0] ?? '') }}</div>
+    </a>
+  @endforeach
+</div>
+
+{{-- 3. Today in numbers --}}
+<h2 style="font-size:20px;margin:0 0 10px">📊 Today in numbers</h2>
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:18px">
+  @php
+    $diffO = $today['orders'] - $yday['orders'];
+    $diffS = $today['sales'] - $yday['sales'];
+    $simple = [
+      ['Money received today', $rs($today['sales']), $diffS === 0 ? 'Same as yesterday' : $rs(abs($diffS)).($diffS > 0 ? ' more than yesterday' : ' less than yesterday'), 'purple', 'rupee'],
+      ['Orders today', number_format($today['orders']), $diffO === 0 ? 'Same as yesterday' : abs($diffO).($diffO > 0 ? ' more than yesterday' : ' fewer than yesterday'), 'blue', 'bag'],
+      ['Delivered', number_format($delivered), $onWay.' on the way now · '.$inKitchen.' in the kitchen', 'green', 'bike'],
+      $newCustomers !== null ? ['New customers', number_format($newCustomers), 'signed up today', 'pink', 'users'] : ['Riders on duty', number_format($riders), 'ready to deliver', 'pink', 'bike'],
+    ];
+  @endphp
+  @foreach($simple as [$label, $value, $sub, $tone, $icon])
     <div class="kpi t-{{ $tone }}">
       <span class="kpi-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $svg[$icon] !!}</svg></span>
-      <div class="kpi-label">{{ $label }}</div>
-      <div class="kpi-value">{{ $value }}</div>
-      @if($delta !== false)<span class="delta">{{ $delta === null ? 'New' : ($delta >= 0 ? '▲ '.$delta.'%' : '▼ '.abs($delta).'%') }}</span>@endif
-      <div class="kpi-sub">{{ $sub }}</div>
+      <div class="kpi-label">{{ $label }}</div><div class="kpi-value">{{ $value }}</div><div class="kpi-sub">{{ $sub }}</div>
     </div>
   @endforeach
 </div>
 
-{{-- Quick actions --}}
+{{-- Shortcuts --}}
 @if($actions)
+  <h2 style="font-size:20px;margin:0 0 10px">⚡ Shortcuts</h2>
   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:18px">
     @foreach($actions as [$href, $title, $sub, $icon, $tone])
       <a href="{{ $href }}" class="soft s-{{ $tone }} tile">
@@ -121,6 +155,10 @@
   </div>
 @endif
 
+{{-- 4. More details --}}
+<details class="dash-more" @if(request('details')) open @endif>
+  <summary>📈 More details — sales chart, order pipeline, branches, top dishes and latest orders</summary>
+  <div style="margin-top:16px">
 {{-- Sales chart + status donut --}}
 <div class="grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr);margin-bottom:18px" id="dash-row1">
   <section class="panel">
@@ -281,7 +319,25 @@
     </div>
   </section>
 </div>
+  </div>
+</details>
 @endsection
 @push('head')
-<style>@media (max-width:1000px){#dash-row1{grid-template-columns:1fr!important}}</style>
+<style>
+.dash-pick{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.18);padding:6px 6px 6px 14px;border-radius:999px}
+.dash-pick select{min-height:40px;border-radius:999px;border:0;padding:0 14px;font-weight:800;background:#fff;color:#12302A;min-width:200px}
+.todo{display:grid;gap:10px}
+.todo-i{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;text-decoration:none;color:var(--ink);border:1.5px solid transparent;transition:transform .15s}
+.todo-i:hover{transform:translateX(3px)}
+.todo-e{font-size:24px;width:40px;text-align:center}.todo-t{flex:1;font-weight:700;font-size:15px}
+.t-amber-soft{background:#FFF5D6;border-color:#F6DE9A}.t-blue-soft{background:#EAF0FF;border-color:#C9D8FB}.t-coral-soft{background:#FFEDE6;border-color:#F6C9B6}.t-purple-soft{background:#F0EAFE;border-color:#D9CBFA}
+.meal-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.meal-card{background:#fff;border-radius:20px;padding:16px;border:1px solid var(--line);border-top:5px solid var(--mc);text-decoration:none;color:var(--ink);display:grid;gap:8px;transition:transform .15s,box-shadow .15s}
+.meal-card:hover{transform:translateY(-3px);box-shadow:0 18px 36px -26px rgba(0,0,0,.5)}
+.mc-t{font-weight:800;font-size:17px}.mc-n{font-size:34px;font-weight:800;line-height:1}.mc-n small{font-size:14px;color:var(--muted);font-weight:700}
+.mc-bar{height:8px;border-radius:99px;background:#EEF2F1;overflow:hidden}.mc-bar span{display:block;height:100%;background:var(--mc);border-radius:99px}
+.dash-more>summary{cursor:pointer;font-weight:800;font-size:16px;padding:16px 18px;background:#fff;border-radius:18px;border:1px solid var(--line);list-style:none}
+.dash-more>summary::-webkit-details-marker{display:none}
+.dash-more[open]>summary{border-color:var(--acc1)}
+@media (max-width:1000px){#dash-row1{grid-template-columns:1fr!important}}</style>
 @endpush

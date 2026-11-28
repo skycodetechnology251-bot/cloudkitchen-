@@ -87,6 +87,17 @@
       </div>
     </section>
 
+    <section class="card bd-sec">
+      <h2><span class="n t-green">4</span> Dashboard font</h2>
+      <p class="small muted" style="margin:0 0 12px">One font for all staff screens: admin, kitchen board, POS and dietitian. Pick a clear, easy-to-read one.</p>
+      <div class="fonts" role="radiogroup" aria-label="Dashboard font">
+        @foreach($fonts as $key => [$label, $stack, $spec, $style])
+          @continue(in_array($key, ['fraunces', 'playfair', 'lora', 'merriweather', 'dmserif'], true))
+          <label class="fcard"><input type="radio" name="font_ui" value="{{ $key }}" data-stack="{{ $stack }}" @checked(old('font_ui', $ui) === $key)><span style="font-family:{{ $stack }};font-size:18px;font-weight:700">Orders 27 · ₹6,752</span><b>{{ $label }}</b><small>{{ $style }}</small></label>
+        @endforeach
+      </div>
+    </section>
+
     <div class="row" style="gap:10px;position:sticky;bottom:0;padding:14px 0;background:linear-gradient(transparent,var(--bg) 30%)">
       <button class="btn">Save branding</button>
       <a class="btn ghost" href="{{ route('home') }}" target="_blank" rel="noopener">Open the website</a>
@@ -114,6 +125,30 @@
   </aside>
 </div>
 </form>
+
+<section class="card" style="margin-top:18px" id="app-login">
+  <h2 style="font-size:19px;display:flex;align-items:center;gap:10px"><span class="n t-blue" style="width:30px;height:30px;border-radius:10px;display:grid;place-items:center;color:#fff;font-size:15px">📱</span> Mobile app login screen</h2>
+  <p class="small muted" style="margin:4px 0 14px">The first screen customers see. Add up to 5 photos (tall food photos look best); they slowly change one after another. Change them any time — the app shows the new ones the next time it opens.</p>
+  <form method="post" action="{{ route('admin.branding.login') }}" enctype="multipart/form-data">@csrf
+    <div class="row" style="gap:12px;align-items:flex-start;flex-wrap:wrap">
+      @forelse($login['paths'] as $i => $p)
+        <label style="width:130px;display:grid;gap:6px;text-align:center">
+          <span style="height:190px;border-radius:18px;background:#EEE center/cover no-repeat;background-image:url('{{ \App\Support\Media::url($p) }}');border:1px solid var(--line)"></span>
+          <span class="small" style="font-weight:700"><input type="checkbox" name="remove[]" value="{{ $p }}" style="width:16px;height:16px;vertical-align:middle"> Remove</span>
+        </label>
+      @empty
+        <div class="soft s-sky" style="padding:14px;max-width:420px">No photos yet — the app shows its built-in food illustration until you add some.</div>
+      @endforelse
+    </div>
+    <div class="field" style="margin-top:14px"><label for="photos">Add photos (JPG, PNG or WEBP, up to 4 MB each)</label><input id="photos" name="photos[]" type="file" accept="image/png,image/jpeg,image/webp" multiple style="padding:8px;background:#fff">
+      @error('photos.*')<div class="small" style="color:var(--bad-ink);font-weight:700">{{ $message }}</div>@enderror</div>
+    <div class="grid g2" style="gap:12px">
+      <div class="field" style="margin:0"><label for="lt">Headline</label><input id="lt" name="login_title" maxlength="70" required value="{{ old('login_title', $login['title']) }}"></div>
+      <div class="field" style="margin:0"><label for="ls">Line under it</label><input id="ls" name="login_subtitle" maxlength="140" value="{{ old('login_subtitle', $login['subtitle']) }}"></div>
+    </div>
+    <button class="btn" style="margin-top:12px">Save app login screen</button>
+  </form>
+</section>
 @endsection
 @push('scripts')
 <script>

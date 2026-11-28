@@ -39,6 +39,24 @@ class Brand
 
     public const DEFAULT_HEAD = 'fraunces';
     public const DEFAULT_BODY = 'manrope';
+    public const DEFAULT_UI = 'poppins';
+
+    /** Font for every dashboard (admin, kitchen board, POS, dietitian): one clean font for headings and text. */
+    public static function uiKey(): string
+    {
+        $k = (string) self::setting('brand', 'font_ui', self::DEFAULT_UI);
+        return isset(self::FONTS[$k]) ? $k : self::DEFAULT_UI;
+    }
+
+    public static function uiFontUrl(): string
+    {
+        return 'https://fonts.googleapis.com/css2?family='.self::FONTS[self::uiKey()][2].'&display=swap';
+    }
+
+    public static function uiCss(): string
+    {
+        return ':root{--font-ui:'.self::FONTS[self::uiKey()][1].",'Noto Sans Tamil',sans-serif}";
+    }
 
     private static function setting(string $group, string $key, $default = null)
     {
@@ -58,14 +76,32 @@ class Brand
     public static function logoUrl(): ?string
     {
         $path = self::setting('brand', 'logo_path');
-        return $path && is_file(public_path($path)) ? asset($path) : null;
+        if (! $path) {
+            return null;
+        }
+        return str_starts_with($path, 'http') || is_file(public_path($path)) ? Media::url($path) : null;
     }
 
     /** Logo address on the main website address (for the apps' config, not tied to the current request). */
     public static function logoAbsoluteUrl(): ?string
     {
         $path = self::setting('brand', 'logo_path');
+        if ($path && str_starts_with($path, 'http')) {
+            return $path;
+        }
         return $path && is_file(public_path($path)) ? rtrim((string) config('app.url'), '/').'/'.ltrim($path, '/') : null;
+    }
+
+    /** Mobile app login screen: rotating photos + headline, changed any time in Admin → Branding. */
+    public static function loginScreen(): array
+    {
+        $paths = json_decode((string) self::setting('brand', 'login_images', '[]'), true) ?: [];
+        $images = array_values(array_filter(array_map(fn ($p) => str_starts_with($p, 'http') ? $p : (is_file(public_path($p)) ? rtrim((string) config('app.url'), '/').'/'.ltrim($p, '/') : null), $paths)));
+        return [
+            'images' => $images, 'paths' => $paths,
+            'title' => (string) self::setting('brand', 'login_title', 'Home-style meals, delivered fresh'),
+            'subtitle' => (string) self::setting('brand', 'login_subtitle', 'Breakfast, lunch, break-time snacks and dinner from your neighbourhood kitchen.'),
+        ];
     }
 
     public static function showName(): bool

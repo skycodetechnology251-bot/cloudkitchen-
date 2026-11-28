@@ -4,10 +4,11 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
 <title>@yield('title', 'Staff') · {{ \App\Support\Brand::name() }}</title>
 @include('partials.brand-head')
+<link href="{{ \App\Support\Brand::uiFontUrl() }}" rel="stylesheet"><style>{!! \App\Support\Brand::uiCss() !!}</style>
 <link rel="stylesheet" href="{{ \App\Support\Asset::v('css/dt.css') }}">
 @stack('head')
 </head>
-<body class="acc-{{ \App\Support\Accent::current() }}">
+<body class="acc-{{ \App\Support\Accent::current() }} ui-font">
 @php($u = auth()->user())
 @php($myKitchens = $u->accessibleKitchens())
 @php($posKitchen = request()->route('kitchen') instanceof \App\Models\Kitchen && request()->routeIs('admin.pos') ? request()->route('kitchen') : null)
@@ -27,6 +28,7 @@
       'tag' => '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/>',
       'cart' => '<path d="M3 4h2l2 12h11l2-8H6"/><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/>',
       'chart' => '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+      'heart' => '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/><path d="M8.5 11h2l1-2 1.5 4 1-2h1.5"/>',
       'users' => '<circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0M16 4a3.5 3.5 0 0 1 0 7M18 20a7 7 0 0 0-3-5.7"/>',
       'wallet' => '<rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12h2M3 10h18"/>',
       'shield' => '<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/>',
@@ -35,7 +37,7 @@
       'flame' => '<path d="M12 22c4 0 7-3 7-7 0-5-5-7-5-12-3 2-6 6-6 9-1-1-2-2-2-4-2 2-1 4-1 7 0 4 3 7 7 7Z"/>',
     ])
     @php($groups = [
-      ['Daily service', [['admin.dashboard', 'Overview', null, 'home', 'teal'], ['admin.orders.index', 'Orders', 'orders.view', 'receipt', 'blue'], ['admin.menus.index', 'Daily menu', 'menu.publish', 'calendar', 'amber']]],
+      ['Daily service', [['admin.dashboard', 'Overview', null, 'home', 'teal'], ['admin.orders.index', 'Orders', 'orders.view', 'receipt', 'blue'], ['admin.menus.index', 'Daily menu', 'menu.publish', 'calendar', 'amber'], ['admin.dietitian', 'Dietitian desk', 'menu.nutrition', 'heart', 'green']]],
       ['Catalogue & areas', [['admin.dishes.index', 'Dishes', 'menu.edit', 'bowl', 'coral'], ['admin.zones.index', 'Zones', 'zones.edit', 'pin', 'pink'], ['admin.branches.index', 'Branches', 'zones.edit', 'store', 'green']]],
       ['Marketing', [['admin.banners.index', 'Banners & popups', 'mkt.banners', 'image', 'purple'], ['admin.offers.index', 'Offers', 'mkt.banners', 'tag', 'pink']]],
       ['Money', [['admin.expenses.index', 'Purchases & expenses', 'expenses.edit', 'cart', 'amber'], ['admin.reports', 'Reports', 'fin.reports', 'chart', 'sky'], ['admin.salaries', 'Salaries & payroll', 'staff.salary', 'wallet', 'green']]],

@@ -9,7 +9,7 @@ namespace App\Support;
 class Asset
 {
     /** Bump together with the marker at the top of public/css/dt.css and site.css. */
-    public const CSS_MARK = 'dt-css 1.13';
+    public const CSS_MARK = 'dt-css 1.14';
 
     public static function v(string $path): string
     {

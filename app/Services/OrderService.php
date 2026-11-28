@@ -78,7 +78,7 @@ class OrderService
                 'order_type' => $opts['order_type'] ?? 'delivery',
                 'cashier_id' => $opts['cashier_id'] ?? null,
                 'service_date' => $quote['service_date'],
-                'meal' => 'lunch',
+                'meal' => $quote['meal'] ?? 'lunch',
                 'slot' => $opts['slot'] ?? null,
                 'status' => 'awaiting_payment',
                 'payment_status' => 'pending',

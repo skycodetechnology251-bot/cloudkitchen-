@@ -32,6 +32,7 @@ class PricingService
         $subtotal = 0;
         $profile = $user?->healthProfile;
         $date = null;
+        $meal = null;
 
         foreach ($items as $menuId => $qty) {
             $qty = (int) $qty;
@@ -40,6 +41,10 @@ class PricingService
                 throw ValidationException::withMessages(['items' => 'A dish in your basket is no longer on this menu.']);
             }
             $date ??= $m->service_date;
+            $meal ??= $m->meal;
+            if ($m->meal !== $meal) {
+                throw ValidationException::withMessages(['items' => 'Please order one meal at a time (for example lunch or dinner).']);
+            }
             if (! $m->service_date->equalTo($date)) {
                 throw ValidationException::withMessages(['items' => 'All dishes must be for the same day.']);
             }
@@ -87,6 +92,7 @@ class PricingService
         return [
             'kitchen_id' => $kitchen->id,
             'service_date' => $date?->toDateString(),
+            'meal' => $meal ?? 'lunch',
             'lines' => $lines,
             'subtotal_paise' => $subtotal,
             'discount_paise' => $discount + $pointsValue,

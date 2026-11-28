@@ -215,3 +215,22 @@ The same app code runs on iPhone. In GitHub → Actions → **iPhone app** → R
 1. Upload **all** folders from the zip (including `public/`), replacing the old files. Keep your `.env`, `storage/` and `public/uploads/`.
 2. Open Admin → System → **Back up and update now**.
 3. Stylesheets load as `dt.css?v=…`, so browsers fetch the new design automatically. If the admin shows a red "styles did not load" banner, the server still has the old `public/css` — upload it again, then press Ctrl + Shift + R (Mac: Cmd + Shift + R). If you use LiteSpeed Cache or Cloudflare, purge its cache once.
+
+## Breakfast, lunch, break time and dinner
+
+- **Daily menu** (Admin → Daily menu): pick a day (14-day strip shows what's published per meal), pick a meal, tick dishes and set price and portions, then Save. "Quick copy" copies the same meal from yesterday, last week or any day/meal. **Meal times** (head office) switches meals on/off and sets each meal's order cut-off and delivery windows.
+- **Add a dish** (Admin → Dishes → + Add a dish): photo, name, Veg/Egg/Non-veg, price and which meals it suits; nutrition is optional and can be left to the dietitian. The live preview shows how customers see it.
+- **App:** the Menu tab has Breakfast / Lunch / Break time / Dinner tabs; one order is for one meal, with that meal's delivery windows.
+
+## Dietitian desk
+
+Admin → Dietitian desk (dietitian and doctor roles land here): dishes on the next 3 days' menus that still need review, everything else waiting, recently approved dishes, how many approved dishes suit each health need, and anonymous totals of what customers shared. The review page is one form: nutrition, salt level, ingredients, allergens, health needs, then Approve (and open the next dish).
+
+## Dashboard
+
+The Overview opens with "What to do today" (menus to publish, orders waiting, dishes almost sold out, dishes waiting for the dietitian, no rider on duty), one card per meal, four plain numbers, shortcuts, and "More details" with the charts. Pick a branch at the top (head office can choose All branches); the choice is remembered. Admin → Branding → **Dashboard font** sets one font for every staff screen (default Poppins).
+
+## App login screen and Google Drive photos
+
+- Admin → Branding → **Mobile app login screen**: up to 5 photos that slowly change, plus the headline and the line under it. The app loads them each time it opens.
+- Admin → Integrations → **Google Drive**: add an OAuth client (Web application, Drive API enabled, redirect address shown on the page), press Connect Google Drive. New dish, banner, logo and login photos go to a "Daily Table photos" folder in that Drive, shared as view-only links. "Move existing photos to Drive" copies older photos. If Drive is unavailable, photos are saved on the server instead.

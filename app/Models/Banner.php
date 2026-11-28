@@ -28,6 +28,6 @@ class Banner extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image_path ? Storage::disk('public')->url($this->image_path) : null;
+        return \App\Support\Media::url($this->image_path);
     }
 }

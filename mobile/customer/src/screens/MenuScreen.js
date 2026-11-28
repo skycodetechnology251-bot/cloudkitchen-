@@ -20,6 +20,10 @@ export function AddButton({ item }) {
   const cart = useCart();
   const q = cart.qty(item.daily_menu_id);
   const add = () => {
+    if (cart.otherMeal(item) && !q) {
+      Alert.alert('Start a new basket?', 'Your basket has a different meal. One order is for one meal (for example lunch or dinner). Start a new basket with this dish?', [{ text: 'Keep basket', style: 'cancel' }, { text: 'Start new basket', onPress: () => cart.add(item) }]);
+      return;
+    }
     if (item.allergy_conflict && !q) {
       Alert.alert('Contains your allergen', `${item.dish.name} contains ${(item.dish.allergens || []).join(', ')}. Add it anyway?`, [{ text: 'Cancel', style: 'cancel' }, { text: 'Add anyway', style: 'destructive', onPress: () => cart.add(item) }]);
     } else cart.add(item);
@@ -29,7 +33,7 @@ export function AddButton({ item }) {
   return <Stepper size={34} qty={q} max={item.available} onMinus={() => cart.remove(item.daily_menu_id)} onPlus={add} />;
 }
 
-export default function MenuScreen({ navigation }) {
+export default function MenuScreen({ navigation, route }) {
   const cart = useCart();
   const [data, setData] = useState(null);
   const [cat, setCat] = useState('All');
@@ -37,12 +41,20 @@ export default function MenuScreen({ navigation }) {
   const [onlyMine, setOnlyMine] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [meals, setMeals] = useState([]);
+  const [meal, setMeal] = useState(route?.params?.meal || 'lunch');
 
   const load = useCallback(async () => {
     if (!cart.kitchenId) { setError('Pick a delivery address on the Today tab to see the menu for your area.'); return; }
     setBusy(true); setError('');
-    try { setData(await api('/menu', { query: { kitchen_id: cart.kitchenId } })); } catch (e) { setError(e.message); } finally { setBusy(false); }
-  }, [cart.kitchenId]);
+    try {
+      api('/meals', { query: { kitchen_id: cart.kitchenId } }).then(setMeals).catch(() => {});
+      const m = await api('/menu', { query: { kitchen_id: cart.kitchenId, meal } });
+      m.items = (m.items || []).map((i) => ({ ...i, meal: m.meal }));
+      setData(m);
+    } catch (e) { setError(e.message); } finally { setBusy(false); }
+  }, [cart.kitchenId, meal]);
+  React.useEffect(() => { if (route?.params?.meal) setMeal(route.params.meal); }, [route?.params?.meal]);
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
   const items = data?.items || [];
@@ -52,17 +64,35 @@ export default function MenuScreen({ navigation }) {
   const sections = [...new Set(shown.map((i) => i.dish.category))].map((c) => ({ title: c, items: shown.filter((i) => i.dish.category === c) }));
   const d = data ? new Date(data.date + 'T00:00:00') : null;
   const when = d ? d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) : '';
-  const cutoff = items[0]?.cutoff || '10:45';
+  const cutoff = (data?.cutoff || items[0]?.cutoff || '10:45').slice(0, 5);
 
   return (
     <Screen refreshing={busy} onRefresh={load} gap={14}>
       <Rise index={0} style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <View style={{ flex: 1 }}>
           <Text accessibilityRole="header" style={{ fontSize: 30, fontWeight: '800', color: C.ink, letterSpacing: -0.5 }}>Menu</Text>
-          {data ? <Muted style={{ fontWeight: '600' }}>{data.date === localToday() ? '' : 'Tomorrow · '}{when} · Lunch</Muted> : null}
+          {data ? <Muted style={{ fontWeight: '600' }}>{data.date === localToday() ? 'Today · ' : ''}{when} · {data.meal_label || 'Lunch'}</Muted> : null}
         </View>
         <Tag label={`Order by ${cutoff}`} style={{ marginTop: 8, fontSize: 12 }} />
       </Rise>
+
+      {meals.length > 1 ? (
+        <Rise index={1}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20 }} contentContainerStyle={{ gap: 10, paddingHorizontal: 20 }}>
+            {meals.map((m) => {
+              const on = m.key === meal;
+              return (
+                <Pressable key={m.key} onPress={() => { setCat('All'); setMeal(m.key); }} accessibilityRole="tab" accessibilityState={{ selected: on }}
+                  style={{ minWidth: 104, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 18, backgroundColor: on ? m.color : 'rgba(255,255,255,0.85)', borderWidth: on ? 0 : 1, borderColor: 'rgba(18,48,42,0.1)', gap: 2 }}>
+                  <Text style={{ fontSize: 20 }}>{m.icon}</Text>
+                  <Text style={{ fontWeight: '800', fontSize: 14, color: on ? '#fff' : C.ink }}>{m.label}</Text>
+                  <Text style={{ fontSize: 11, fontWeight: '600', color: on ? 'rgba(255,255,255,0.9)' : C.muted }}>{m.dishes ? `${m.dishes} dishes · by ${String(m.cutoff).slice(0, 5)}` : 'No menu yet'}</Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </Rise>
+      ) : null}
 
       <Rise index={1}>
         <Glass style={{ flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 999, paddingLeft: 16, paddingRight: 6, minHeight: 52 }}>
@@ -120,7 +150,8 @@ export default function MenuScreen({ navigation }) {
           })}
         </View>
       ))}
-      {data && !shown.length ? <Muted style={{ textAlign: 'center', marginTop: 20 }}>No dishes match. Try another category or search.</Muted> : null}
+      {data && !items.length ? <Muted style={{ textAlign: 'center', marginTop: 20 }}>No {(data.meal_label || 'lunch').toLowerCase()} menu yet. Please check again later or pick another meal.</Muted> : null}
+      {data && items.length > 0 && !shown.length ? <Muted style={{ textAlign: 'center', marginTop: 20 }}>No dishes match. Try another category or search.</Muted> : null}
     </Screen>
   );
 }

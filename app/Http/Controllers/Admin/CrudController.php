@@ -96,7 +96,11 @@ abstract class CrudController extends Controller
             } elseif ($type === 'file') {
                 unset($data[$k]);
                 if ($r->hasFile($k)) {
-                    $data[$f['column'] ?? $k] = $r->file($k)->store($f['dir'] ?? 'uploads', $f['disk'] ?? 'public');
+                    $col = $f['column'] ?? $k;
+                    // Photos: Google Drive when connected, else public/uploads. Private files (bills) stay private.
+                    $data[$col] = ($f['disk'] ?? 'public') === 'local'
+                        ? $r->file($k)->store($f['dir'] ?? 'uploads', 'local')
+                        : \App\Support\Media::store($r->file($k), $f['dir'] ?? 'uploads', $item?->{$col});
                 }
             } elseif ($type === 'password') {
                 if (empty($data[$k])) {

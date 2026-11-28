@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 class SettingController extends Controller
 {
     public const GROUPS = [
+        'gdrive' => ['label' => 'Google Drive (photo storage)', 'fields' => ['client_id' => ['OAuth client ID', false], 'client_secret' => ['OAuth client secret', true]],
+            'note' => 'Google Cloud → APIs & Services: enable "Google Drive API", then Credentials → Create OAuth client (Web application) and add the redirect address shown below. Save, then press Connect Google Drive.'],
         'razorpay' => ['label' => 'Razorpay payments', 'fields' => ['key_id' => ['Key ID', false], 'key_secret' => ['Key secret', true], 'webhook_secret' => ['Webhook secret', true]],
             'note' => 'Webhook URL: /api/v1/webhooks/razorpay. Events: payment.captured, payment.failed, refund.processed.'],
         'google' => ['label' => 'Google sign-in & Maps', 'fields' => ['maps_api_key' => ['Google Maps API key (browser key, for the zone map in admin)', false], 'android_client_id' => ['Android client ID', false], 'ios_client_id' => ['iPhone client ID', false], 'web_client_id' => ['Web client ID', false], 'client_ids' => ['Other allowed client IDs (optional, comma separated)', false]],
@@ -45,7 +47,9 @@ class SettingController extends Controller
                 $values[$g][$k] = $secret ? ($v ? '•••• stored' : '') : $v;
             }
         }
-        return view('admin.settings', ['groups' => self::GROUPS, 'values' => $values, 'gst' => config('dailytable.gst')]);
+        return view('admin.settings', ['groups' => self::GROUPS, 'values' => $values, 'gst' => config('dailytable.gst'),
+            'drive' => ['configured' => \App\Support\GoogleDrive::configured(), 'connected' => \App\Support\GoogleDrive::connected(), 'since' => Setting::get('gdrive', 'connected_at'),
+                'redirect' => \App\Support\GoogleDrive::redirectUri(), 'local' => \App\Http\Controllers\Admin\DriveController::localPhotoCount()]]);
     }
 
     public function update(Request $r, string $group)

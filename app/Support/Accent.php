@@ -9,7 +9,7 @@ class Accent
         'admin.dashboard' => 'teal', 'admin.orders' => 'blue', 'admin.invoice' => 'blue', 'admin.menus' => 'amber',
         'admin.dishes' => 'coral', 'admin.zones' => 'pink', 'admin.branches' => 'green', 'admin.banners' => 'purple',
         'admin.offers' => 'pink', 'admin.expenses' => 'amber', 'admin.reports' => 'sky', 'admin.salaries' => 'green',
-        'admin.staff' => 'indigo', 'admin.roles' => 'purple', 'admin.settings' => 'sky', 'admin.system' => 'slate', 'admin.branding' => 'pink',
+        'admin.staff' => 'indigo', 'admin.roles' => 'purple', 'admin.settings' => 'sky', 'admin.system' => 'slate', 'admin.branding' => 'pink', 'admin.dietitian' => 'green',
         'admin.kitchen' => 'coral', 'admin.pos' => 'teal',
     ];
 

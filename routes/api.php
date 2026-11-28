@@ -11,6 +11,7 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/otp/verify', [Api\AuthController::class, 'verifyOtp'])->middleware('throttle:20,1');
     Route::post('auth/google', [Api\AuthController::class, 'google'])->middleware('throttle:20,1');
     Route::get('banners', [Api\CatalogueController::class, 'banners']);
+    Route::get('app/login-screen', fn () => response()->json(collect(\App\Support\Brand::loginScreen())->except('paths')->all() + ['brand' => \App\Support\Brand::name(), 'logo' => \App\Support\Brand::logoAbsoluteUrl()])->header('Cache-Control', 'public, max-age=120'));
     Route::post('serviceability', [Api\CatalogueController::class, 'serviceability']);
     Route::get('dishes/{dish:slug}', [Api\CatalogueController::class, 'dish']);
     Route::post('webhooks/razorpay', [Api\CheckoutController::class, 'webhook']);
@@ -38,6 +39,7 @@ Route::prefix('v1')->group(function () {
         Route::post('addresses/detect', [Api\AddressController::class, 'detect']);
 
         Route::get('menu', [Api\CatalogueController::class, 'menu']);
+        Route::get('meals', [Api\CatalogueController::class, 'meals']);
         Route::post('meal-responses', [Api\CatalogueController::class, 'mealResponse']);
         Route::post('banners/{banner}/tap', [Api\CatalogueController::class, 'bannerTap']);
 

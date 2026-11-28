@@ -42,7 +42,7 @@ export default function CheckoutScreen({ navigation }) {
   // Delivery windows come from the server (Admin can change them).
   useEffect(() => {
     if (!address) return;
-    api('/serviceability', { method: 'POST', body: { lat: address.lat, lng: address.lng } })
+    api('/serviceability', { method: 'POST', body: { lat: address.lat, lng: address.lng, meal: cart.meal || 'lunch' } })
       .then((s) => { setSlots(s.slots || []); setSlot((cur) => ((s.slots || []).includes(cur) ? cur : (s.slots || [])[0] || null)); }).catch(() => {});
   }, [address?.id]);
 

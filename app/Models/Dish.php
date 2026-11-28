@@ -17,6 +17,7 @@ class Dish extends Model
             'balance' => 'array',
             'ingredients' => 'array',
             'allergens' => 'array',
+            'meal_types' => 'array',
             'suitable_for' => 'array',
             'reviewed_at' => 'datetime',
             'is_active' => 'boolean',
@@ -27,7 +28,7 @@ class Dish extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image_path ? Storage::disk('public')->url($this->image_path) : null;
+        return \App\Support\Media::url($this->image_path);
     }
 
     public function isReviewed(): bool

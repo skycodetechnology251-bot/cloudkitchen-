@@ -1,4 +1,4 @@
-/* dt-css 1.13 · Daily Table admin + shared styles */
+/* dt-css 1.14 · Daily Table admin + shared styles */
 /* Daily Table — shared styles for the website, staff web and invoices */
 :root{--font-head:'Fraunces',Georgia,serif;--font-body:'Manrope',system-ui,sans-serif;--teal:#0F5C4D;--teal-2:#1D7564;--mint:#BFE8D6;--mint-2:#E3F1EC;--bg:#F3F7F5;--ink:#12302A;--muted:#56706A;--line:#E6EEEA;--warn:#FBF0D6;--warn-ink:#6B4A06;--bad:#FBEAE2;--bad-ink:#8A3A17;--radius:20px}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
@@ -212,9 +212,15 @@ body{--acc1:#0F5C4D;--acc2:#2554B8;--acc-soft:#E8F3EF;--acc-ink:#0F5C4D}
 .main>h1::after{content:"";position:absolute;right:-50px;top:-70px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.12)}
 
 /* Branding: heading font everywhere in the admin, brand mark in the sidebar */
-.main h1,.main h2,.dash-hero h1,.pagehead h1,.kpi-value{font-family:var(--font-head)}
+.main h1,.main h2,.dash-hero h1,.pagehead h1,.kpi-value{font-family:var(--font-ui,var(--font-head))}
 button,input,select,textarea{font-family:var(--font-body)}
 .side .brand{display:flex;align-items:center;gap:10px}
 .side .brand .brand-icon,.s-logo .brand-icon{width:38px;height:38px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 38px}
 .side .brand .brand-logo{background:#fff;border-radius:10px;padding:4px}
 .brand-name{font-family:var(--font-head)}
+
+/* Dashboard font (Admin → Branding → Dashboard font): one friendly font for all staff screens */
+body.ui-font,body.ui-font button,body.ui-font input,body.ui-font select,body.ui-font textarea,body.ui-font .btn,body.ui-font .brand-name{font-family:var(--font-ui)}
+body.ui-font{letter-spacing:.005em}
+body.ui-font .main h1{font-weight:700;letter-spacing:-.01em}
+body.ui-font .main h2{font-weight:700}

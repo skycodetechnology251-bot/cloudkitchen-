@@ -23,9 +23,10 @@ class DishController extends CrudController
             'name' => ['label' => 'Name', 'rules' => 'required|string|max:80'],
             'category_id' => ['label' => 'Category', 'type' => 'select', 'options' => Category::orderBy('sort')->pluck('name', 'id')->all(), 'rules' => 'required|exists:categories,id'],
             'description' => ['label' => 'Description', 'type' => 'textarea', 'rules' => 'nullable|string|max:300'],
+            'meal_types' => ['label' => 'Good for which meals?', 'type' => 'multiselect', 'options' => collect(\App\Support\Meals::all())->mapWithKeys(fn ($m, $k) => [$k => $m['label']])->all(), 'rules' => 'nullable|array'],
             'diet' => ['label' => 'Diet', 'type' => 'select', 'options' => ['veg' => 'Vegetarian', 'egg' => 'Contains egg', 'nonveg' => 'Non-vegetarian'], 'rules' => 'required|in:veg,egg,nonveg'],
             'price_paise' => ['label' => 'Default price (₹)', 'type' => 'money', 'rules' => 'required|numeric|min:1'],
-            'image' => ['label' => 'Top-down photo (square, 1080 px)', 'type' => 'file', 'column' => 'image_path', 'dir' => 'dishes', 'rules' => 'nullable|image|max:1024'],
+            'image' => ['label' => 'Top-down photo (square, 1080 px)', 'type' => 'file', 'column' => 'image_path', 'dir' => 'dishes', 'rules' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096'],
             'kcal' => ['label' => 'Calories (kcal)', 'type' => 'number', 'rules' => 'nullable|integer|min:0'],
             'protein_g' => ['label' => 'Protein (g)', 'type' => 'number', 'rules' => 'nullable|integer|min:0'],
             'carbs_g' => ['label' => 'Carbs (g)', 'type' => 'number', 'rules' => 'nullable|integer|min:0'],
@@ -38,6 +39,27 @@ class DishController extends CrudController
             'suitable_for' => ['label' => 'Reviewed as suitable for (dietitian only)', 'type' => 'multiselect', 'options' => array_combine($conds, $conds), 'rules' => 'nullable|array', 'perm' => 'menu.nutrition'],
             'is_active' => ['label' => 'Active', 'type' => 'checkbox'],
         ];
+    }
+
+    public function index(Request $r)
+    {
+        $dishes = Dish::with('category')->orderByDesc('is_active')->orderBy('name')->get();
+        return view('admin.dishes.index', ['dishes' => $dishes, 'meals' => \App\Support\Meals::all()]);
+    }
+
+    public function create()
+    {
+        return $this->form(new Dish(['is_active' => true, 'diet' => 'veg', 'sodium' => 'medium', 'meal_types' => ['lunch']]));
+    }
+
+    public function edit($id)
+    {
+        return $this->form(Dish::findOrFail($id));
+    }
+
+    private function form(Dish $dish)
+    {
+        return view('admin.dishes.form', ['dish' => $dish, 'fields' => $this->fields($dish->exists ? $dish : null), 'meals' => \App\Support\Meals::all()]);
     }
 
     protected function filled(Model $item, array $data, Request $r): void

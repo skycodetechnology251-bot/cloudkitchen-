@@ -51,10 +51,16 @@ Route::middleware(['auth', 'role:admin,ops,kitchen_manager,kitchen_staff,cashier
         Route::get('kitchens/{any?}', fn () => redirect()->route('admin.branches.index'))->where('any', '.*');
     });
     Route::middleware('perm:menu.edit')->resource('dishes', Admin\DishController::class)->except('show');
+    Route::middleware('perm:menu.nutrition')->group(function () {
+        Route::get('dietitian', [Admin\DietitianController::class, 'index'])->name('dietitian');
+        Route::get('dietitian/dishes/{dish}', [Admin\DietitianController::class, 'review'])->name('dietitian.review');
+        Route::post('dietitian/dishes/{dish}', [Admin\DietitianController::class, 'save'])->name('dietitian.save');
+    });
     Route::middleware('perm:menu.publish')->group(function () {
         Route::get('menus', [Admin\MenuController::class, 'index'])->name('menus.index');
         Route::post('menus', [Admin\MenuController::class, 'store'])->name('menus.store');
         Route::post('menus/copy', [Admin\MenuController::class, 'copy'])->name('menus.copy');
+        Route::post('menus/meal-times', [Admin\MenuController::class, 'mealTimes'])->name('menus.meal-times');
     });
     Route::middleware('perm:orders.view')->group(function () {
         Route::get('orders', [Admin\OrderController::class, 'index'])->name('orders.index');
@@ -82,8 +88,13 @@ Route::middleware(['auth', 'role:admin,ops,kitchen_manager,kitchen_staff,cashier
         Route::post('system/update', [Admin\SystemController::class, 'update'])->middleware('throttle:3,10')->name('system.update');
         Route::get('system/backups/{file}', [Admin\SystemController::class, 'backup'])->where('file', '[A-Za-z0-9_.\-]+')->name('system.backup');
         Route::get('settings', [Admin\SettingController::class, 'index'])->name('settings.index');
+        Route::get('google-drive/connect', [Admin\DriveController::class, 'connect'])->name('gdrive.connect');
+        Route::get('google-drive/callback', [Admin\DriveController::class, 'callback'])->name('gdrive.callback');
+        Route::post('google-drive/disconnect', [Admin\DriveController::class, 'disconnect'])->name('gdrive.disconnect');
+        Route::post('google-drive/migrate', [Admin\DriveController::class, 'migrate'])->middleware('throttle:3,10')->name('gdrive.migrate');
         Route::get('branding', [Admin\BrandingController::class, 'show'])->name('branding');
         Route::post('branding', [Admin\BrandingController::class, 'update'])->middleware('throttle:20,1')->name('branding.update');
+        Route::post('branding/app-login', [Admin\BrandingController::class, 'loginScreen'])->middleware('throttle:20,1')->name('branding.login');
         Route::put('settings/{group}', [Admin\SettingController::class, 'update'])->name('settings.update');
     });
     Route::middleware('perm:fin.reports')->group(function () {
