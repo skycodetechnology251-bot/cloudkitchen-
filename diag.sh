@@ -11,6 +11,12 @@ adb exec-out screencap -p > "out/screen.png"
 adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb shell cat /sdcard/ui.xml > out/ui.xml
 b=$(grep -o 'class="android.widget.EditText"[^>]*bounds="[^"]*"' out/ui.xml | head -1 | grep -o 'bounds="[^"]*"' | grep -o '[0-9]\+' | tr '\n' ' ')
 echo "field bounds before: $b" >> out/status.txt
+if [ -z "$b" ]; then
+  # Screen keeps animating, so uiautomator can't read it: tap where the number box is (64% across, 74% down).
+  sz=$(adb shell wm size | grep -o '[0-9]*x[0-9]*' | tail -1); W=${sz%x*}; H=${sz#*x}
+  b="$((W*55/100)) $((H*72/100)) $((W*73/100)) $((H*76/100))"; echo "screen $W x $H, tapping $b" >> out/status.txt
+  SKIPB="$((W*80/100)) $((H*8/100)) $((W*87/100)) $((H*10/100))"
+fi
 set -- $b
 if [ -n "$4" ]; then
   adb shell input tap $(( ($1+$3)/2 )) $(( ($2+$4)/2 )); sleep 3
@@ -23,7 +29,7 @@ if [ -n "$4" ]; then
   adb shell input keyevent 4; sleep 2
 fi
 # Skip (customer app): browse without logging in.
-s=$(grep -o 'content-desc="Skip[^"]*"[^>]*bounds="[^"]*"' out/ui.xml | head -1 | grep -o 'bounds="[^"]*"' | grep -o '[0-9]\+' | tr '\n' ' ')
+s=${SKIPB:-$(grep -o 'content-desc="Skip[^"]*"[^>]*bounds="[^"]*"' out/ui.xml | head -1 | grep -o 'bounds="[^"]*"' | grep -o '[0-9]\+' | tr '\n' ' ')}
 set -- $s
 if [ -n "$4" ]; then
   adb shell input tap $(( ($1+$3)/2 )) $(( ($2+$4)/2 )); sleep 12
