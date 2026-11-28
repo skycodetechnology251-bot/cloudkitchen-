@@ -1,0 +1,9 @@
+pid=3593
+field bounds before: 
+screen 320 x 640, tapping 176 460 233 486
+  mInputShown=true
+field after: 
+    mGivenContentInsets=[0,419][0,0] mGivenVisibleInsets=[0,419][0,0]
+after skip pid=3593
+    topResumedActivity=ActivityRecord{b112afe u0 in.dailytable.app/.MainActivity t8}
+  ResumedActivity: ActivityRecord{b112afe u0 in.dailytable.app/.MainActivity t8}

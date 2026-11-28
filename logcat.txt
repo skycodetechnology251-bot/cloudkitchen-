@@ -1,0 +1,300 @@
+11-28 06:13:36.530 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:13:36.530 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:13:36.530 W/PeoplePU( 1457): Caused by: android.os.RemoteException: Remote stack trace:
+11-28 06:13:36.579 W/Conscrypt( 1457): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:13:36.743 W/ModernMediaScanner( 1601): android.database.sqlite.SQLiteConstraintException: UNIQUE constraint failed: files._data (code 2067 SQLITE_CONSTRAINT_UNIQUE)
+11-28 06:13:36.744 W/ModernMediaScanner( 1601): android.database.sqlite.SQLiteConstraintException: UNIQUE constraint failed: files._data (code 2067 SQLITE_CONSTRAINT_UNIQUE)
+11-28 06:13:36.818 W/PeoplePU( 1457): android.content.pm.PackageManager$NameNotFoundException: ComponentInfo{com.google.android.gms/com.google.android.gms.people.sync.focus.ContactsSyncAdapterService}
+11-28 06:13:37.645 I/SemanticLocation( 1419): java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/model_bundle_metadata.pb: open failed: ENOENT (No such file or directory)
+11-28 06:13:37.645 I/SemanticLocation( 1419): Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+11-28 06:13:37.714 I/SemanticLocation( 1419): java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/model_bundle_metadata.pb: open failed: ENOENT (No such file or directory)
+11-28 06:13:37.714 I/SemanticLocation( 1419): Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+11-28 06:13:38.739 W/Conscrypt( 1419): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:13:38.890 W/Conscrypt( 1419): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:13:38.970 W/GLSUser ( 1419): [AppCertManager] Exception while requesting key: 
+11-28 06:13:38.970 W/GLSUser ( 1419): java.io.IOException: Invalid device key response.
+11-28 06:13:39.356 E/PhenotypeFlagCommitter( 1457): java.util.concurrent.TimeoutException: Timed out waiting for Task
+11-28 06:13:39.405 E/RecoverySnapshotStorage(  526): java.io.FileNotFoundException: /data/system/recoverablekeystore/snapshots/10131.xml: open failed: ENOENT (No such file or directory)
+11-28 06:13:39.405 E/RecoverySnapshotStorage(  526): Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+11-28 06:13:39.734 E/RecoverySnapshotStorage(  526): java.io.FileNotFoundException: /data/system/recoverablekeystore/snapshots/10131.xml: open failed: ENOENT (No such file or directory)
+11-28 06:13:39.734 E/RecoverySnapshotStorage(  526): Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+11-28 06:13:39.741 W/RecoverableKeyStoreGms( 1457): [WrappingKeyManager] InternalRecoveryServiceException during wrapping key generation [CONTEXT service_id=172 ]
+11-28 06:13:39.741 W/RecoverableKeyStoreGms( 1457): android.security.keystore.recovery.InternalRecoveryServiceException: Failed to import secret key.
+11-28 06:13:39.741 W/RecoverableKeyStoreGms( 1457): 	at android.security.keystore.recovery.RecoveryController.wrapUnexpectedServiceSpecificException(RecoveryController.java:783)
+11-28 06:13:39.741 W/RecoverableKeyStoreGms( 1457): Caused by: android.os.ServiceSpecificException: Failed to import secret key. (code 22)
+11-28 06:13:39.741 W/RecoverableKeyStoreGms( 1457): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3071)
+11-28 06:13:39.741 W/RecoverableKeyStoreGms( 1457): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:13:39.741 W/RecoverableKeyStoreGms( 1457): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:13:39.741 W/RecoverableKeyStoreGms( 1457): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:13:40.102 W/NetworkScheduler( 1419): java.lang.IllegalArgumentException: Only the following extra parameter types are supported: Integer, Long, Double, String, Boolean, and nested Bundles with the same restrictions.
+11-28 06:13:40.261 E/enyj    ( 1419): java.lang.RuntimeException: ManagedChannel allocation site
+11-28 06:13:40.414 W/Conscrypt( 1419): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:13:40.486 W/Conscrypt( 1419): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:13:41.378 W/Conscrypt( 1457): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:13:41.431 W/Conscrypt( 1457): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:13:41.655 W/Conscrypt( 1419): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:13:41.752 W/Conscrypt( 1419): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:13:42.151 E/RecoverySnapshotStorage(  526): java.io.FileNotFoundException: /data/system/recoverablekeystore/snapshots/10131.xml: open failed: ENOENT (No such file or directory)
+11-28 06:13:42.151 E/RecoverySnapshotStorage(  526): Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+11-28 06:13:42.155 W/RecoverableKeyStoreGms( 1457): [WrappingKeyManager] InternalRecoveryServiceException during wrapping key generation [CONTEXT service_id=172 ]
+11-28 06:13:42.155 W/RecoverableKeyStoreGms( 1457): android.security.keystore.recovery.InternalRecoveryServiceException: Failed to import secret key.
+11-28 06:13:42.155 W/RecoverableKeyStoreGms( 1457): 	at android.security.keystore.recovery.RecoveryController.wrapUnexpectedServiceSpecificException(RecoveryController.java:783)
+11-28 06:13:42.155 W/RecoverableKeyStoreGms( 1457): Caused by: android.os.ServiceSpecificException: Failed to import secret key. (code 22)
+11-28 06:13:42.155 W/RecoverableKeyStoreGms( 1457): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3071)
+11-28 06:13:42.155 W/RecoverableKeyStoreGms( 1457): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:13:42.155 W/RecoverableKeyStoreGms( 1457): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:13:42.155 W/RecoverableKeyStoreGms( 1457): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:13:42.496 E/cr_CronetUrlRequestContext( 1727): Exception in upload method
+11-28 06:13:42.601 W/NetworkScheduler( 1419): java.lang.IllegalArgumentException: Only the following extra parameter types are supported: Integer, Long, Double, String, Boolean, and nested Bundles with the same restrictions.
+11-28 06:13:43.246 W/Conscrypt( 1457): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:13:43.272 W/Conscrypt( 1457): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:13:43.796 W/ModernMediaScanner( 1601): android.database.sqlite.SQLiteConstraintException: UNIQUE constraint failed: files._data (code 2067 SQLITE_CONSTRAINT_UNIQUE)
+11-28 06:13:44.353 W/SliceDataConverter( 1051): java.lang.IllegalStateException: Invalid preference controller: com.android.settings.network.telephony.CallsDefaultSubscriptionController
+11-28 06:13:44.353 W/SliceDataConverter( 1051): Caused by: java.lang.NoSuchMethodException: com.android.settings.network.telephony.CallsDefaultSubscriptionController.<init> [class android.content.Context, class java.lang.String]
+11-28 06:13:44.369 W/SliceDataConverter( 1051): java.lang.IllegalStateException: Invalid preference controller: com.android.settings.applications.credentials.CredentialManagerPreferenceController
+11-28 06:13:44.369 W/SliceDataConverter( 1051): Caused by: java.lang.reflect.InvocationTargetException
+11-28 06:13:44.369 W/SliceDataConverter( 1051): Caused by: java.lang.RuntimeException: Can't create handler inside thread Thread[binder:1051_1,5,main] that has not called Looper.prepare()
+11-28 06:13:44.381 E/HardwareInfoFeatureProviderImpl( 1051): java.lang.NumberFormatException: For input string: "E"
+11-28 06:13:44.382 W/SliceDataConverter( 1051): java.lang.IllegalStateException: Invalid preference controller: com.android.settings.network.telephony.CallsDefaultSubscriptionController
+11-28 06:13:44.382 W/SliceDataConverter( 1051): Caused by: java.lang.NoSuchMethodException: com.android.settings.network.telephony.CallsDefaultSubscriptionController.<init> [class android.content.Context, class java.lang.String]
+11-28 06:13:44.408 W/SliceDataConverter( 1051): java.lang.IllegalStateException: Invalid preference controller: com.android.settings.applications.appinfo.ManageAppLocalePreferenceController
+11-28 06:13:44.408 W/SliceDataConverter( 1051): Caused by: java.lang.ClassNotFoundException: com.android.settings.applications.appinfo.ManageAppLocalePreferenceController
+11-28 06:13:44.408 W/SliceDataConverter( 1051): Caused by: java.lang.ClassNotFoundException: com.android.settings.applications.appinfo.ManageAppLocalePreferenceController
+11-28 06:13:44.469 W/SliceDataConverter( 1051): java.lang.IllegalStateException: Invalid preference controller: com.android.settings.network.NetworkProviderSimsCategoryController
+11-28 06:13:44.469 W/SliceDataConverter( 1051): Caused by: java.lang.NoSuchMethodException: com.android.settings.network.NetworkProviderSimsCategoryController.<init> [class android.content.Context, class java.lang.String]
+11-28 06:13:44.470 W/SliceDataConverter( 1051): java.lang.IllegalStateException: Invalid preference controller: com.android.settings.accessibility.VibrationMainSwitchPreferenceController
+11-28 06:13:44.470 W/SliceDataConverter( 1051): Caused by: java.lang.reflect.InvocationTargetException
+11-28 06:13:44.470 W/SliceDataConverter( 1051): Caused by: java.lang.RuntimeException: Can't create handler inside thread Thread[binder:1051_1,5,main] that has not called Looper.prepare()
+11-28 06:13:44.599 W/SliceDataConverter( 1051): java.lang.IllegalStateException: Invalid preference controller: com.android.settings.applications.appinfo.ManageAppLocalePreferenceController
+11-28 06:13:44.599 W/SliceDataConverter( 1051): Caused by: java.lang.ClassNotFoundException: com.android.settings.applications.appinfo.ManageAppLocalePreferenceController
+11-28 06:13:44.599 W/SliceDataConverter( 1051): Caused by: java.lang.ClassNotFoundException: com.android.settings.applications.appinfo.ManageAppLocalePreferenceController
+11-28 06:13:44.615 W/SliceDataConverter( 1051): java.lang.IllegalStateException: Invalid preference controller: com.android.settings.fuelgauge.batteryusage.BatteryChartPreferenceController
+11-28 06:13:44.615 W/SliceDataConverter( 1051): Caused by: java.lang.NoSuchMethodException: com.android.settings.fuelgauge.batteryusage.BatteryChartPreferenceController.<init> [class android.content.Context, class java.lang.String]
+11-28 06:13:44.635 E/SystemServiceRegistry( 1051): android.os.ServiceManager$ServiceNotFoundException: No service published for: ethernet
+11-28 06:13:44.649 W/SliceDataConverter( 1051): java.lang.IllegalStateException: Invalid preference controller: com.android.settings.development.DevelopmentMemtagFooterPreferenceController
+11-28 06:13:44.649 W/SliceDataConverter( 1051): Caused by: java.lang.ClassNotFoundException: com.android.settings.development.DevelopmentMemtagFooterPreferenceController
+11-28 06:13:44.649 W/SliceDataConverter( 1051): Caused by: java.lang.ClassNotFoundException: com.android.settings.development.DevelopmentMemtagFooterPreferenceController
+11-28 06:13:45.091 W/MediaProvider( 1601): java.io.IOException: Failed to update quota type for /storage/emulated/0/Android
+11-28 06:13:45.098 W/MediaProvider( 1601): java.io.IOException: Failed to update quota type for /storage/emulated/0/Android/media
+11-28 06:13:47.721 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:13:48.581 E/VS.BluetoothShim( 1659): java.lang.NoSuchMethodException: android.bluetooth.BluetoothHeadset.startScoUsingVirtualVoiceCall [class android.bluetooth.BluetoothDevice]
+11-28 06:13:49.105 W/Conscrypt( 1419): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:13:49.139 W/Conscrypt( 1419): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:13:52.837 W/AsyncOperation( 1419): OperationException[Status{statusCode=Stale snapshot for com.google.apps.dynamite.device#com.google.android.gm(change count changed - expected 2  but was 0), resolution=null}]
+11-28 06:13:52.839 W/AsyncOperation( 1419): OperationException[Status{statusCode=Stale snapshot for com.google.android.libraries.communications.conference.device#com.google.android.gm(change count changed - expected 2  but was 0), resolution=null}]
+11-28 06:13:53.147 W/AsyncOperation( 1419): OperationException[Status{statusCode=Stale snapshot for com.google.android.googlequicksearchbox(change count changed - expected 2  but was 1), resolution=null}]
+11-28 06:13:53.205 E/ApplicationPropertiesBu( 1727): java.lang.NumberFormatException: For input string: "messages"
+11-28 06:13:53.217 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:13:53.295 W/A       ( 1727): Exception while fetching versionCode for package[com.google.android.apps.tv.dreamx].
+11-28 06:13:53.295 W/A       ( 1727): android.content.pm.PackageManager$NameNotFoundException: com.google.android.apps.tv.dreamx
+11-28 06:13:53.295 W/A       ( 1727): Exception while fetching versionCode for package[com.google.android.apps.tv.launcherx].
+11-28 06:13:53.295 W/A       ( 1727): android.content.pm.PackageManager$NameNotFoundException: com.google.android.apps.tv.launcherx
+11-28 06:13:54.366 W/RcsClientLib( 4295): java.lang.IllegalStateException: JibeService Not Initialized
+11-28 06:13:54.366 W/RcsClientLib( 4295): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3065)
+11-28 06:13:54.366 W/RcsClientLib( 4295): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:13:54.366 W/RcsClientLib( 4295): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:13:54.366 W/RcsClientLib( 4295): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:13:54.366 W/RcsClientLib( 4295): 	at com.google.android.aidl.BaseProxy.transactAndReadExceptionReturnVoid(PG:3)
+11-28 06:13:54.884 E/BugleRcsEngine( 4812): [2] JibeService.onDestroy: JibeService: onDestroy() unregister factory exception: java.lang.IllegalArgumentException: Receiver not registered: com.google.android.ims.receiver.sip.DebugOptionsReceiver@c45370a
+11-28 06:13:55.356 W/AsyncOperation( 1419): OperationException[Status{statusCode=Stale snapshot for com.google.android.apps.messaging#com.google.android.apps.messaging(change count changed - expected 2  but was 1), resolution=null}]
+11-28 06:13:55.428 W/PhenotypeFlagCommitter( 1419): java.util.concurrent.TimeoutException: Timed out waiting for Task
+11-28 06:13:55.522 W/AsyncOperation( 1419): OperationException[Status{statusCode=Stale snapshot for com.google.android.apps.messaging#com.google.android.apps.messaging(change count changed - expected 2  but was 1), resolution=null}]
+11-28 06:13:55.637 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:13:55.787 W/AsyncOperation( 1419): OperationException[Status{statusCode=Stale snapshot for com.google.android.apps.messaging.auto#com.google.android.apps.messaging(change count changed - expected 2  but was 1), resolution=null}]
+11-28 06:13:56.108 W/RcsClientLib( 4295): java.lang.IllegalStateException: JibeService Not Initialized
+11-28 06:13:56.108 W/RcsClientLib( 4295): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3065)
+11-28 06:13:56.108 W/RcsClientLib( 4295): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:13:56.108 W/RcsClientLib( 4295): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:13:56.108 W/RcsClientLib( 4295): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:13:56.108 W/RcsClientLib( 4295): 	at com.google.android.aidl.BaseProxy.transactAndReadExceptionReturnVoid(PG:3)
+11-28 06:13:56.108 W/RcsClientLib( 4295): java.lang.IllegalStateException: JibeService Not Initialized
+11-28 06:13:56.108 W/RcsClientLib( 4295): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3065)
+11-28 06:13:56.108 W/RcsClientLib( 4295): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:13:56.108 W/RcsClientLib( 4295): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:13:56.108 W/RcsClientLib( 4295): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:13:56.108 W/RcsClientLib( 4295): 	at com.google.android.aidl.BaseProxy.transactAndReadExceptionReturnVoid(PG:3)
+11-28 06:13:56.322 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:13:57.304 W/AsyncOperation( 1419): OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.clearcut_client#com.google.android.inputmethod.latin(change count changed - expected 2  but was 1), resolution=null}]
+11-28 06:13:57.462 W/AsyncOperation( 1419): OperationException[Status{statusCode=Stale snapshot for com.google.android.inputmethod.latin#com.google.android.inputmethod.latin(change count changed - expected 3  but was 2), resolution=null}]
+11-28 06:13:57.785 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:13:57.796 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:13:58.111 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:13:58.366 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:13:58.505 E/AppOps  (  526): java.lang.SecurityException: Specified package "android" under uid 10182 but it is not
+11-28 06:13:58.529 E/AppOps  (  526): java.lang.SecurityException: Specified package "android" under uid 10182 but it is not
+11-28 06:13:58.530 E/AppOps  (  526): java.lang.SecurityException: Specified package "android" under uid 10182 but it is not
+11-28 06:13:58.530 E/AppOps  (  526): java.lang.SecurityException: Specified package "android" under uid 10182 but it is not
+11-28 06:13:59.750 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:00.705 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:00.983 E/HardwareInfoFeatureProviderImpl( 1051): java.lang.NumberFormatException: For input string: "E"
+11-28 06:14:00.991 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:01.135 E/HardwareInfoFeatureProviderImpl( 1051): java.lang.NumberFormatException: For input string: "E"
+11-28 06:14:01.551 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:01.916 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:02.274 W/WifiService(  526): Permission violation - getConfiguredNetworks not allowed for uid=10119, packageName=com.google.android.settings.intelligence, reason=java.lang.SecurityException: UID 10119 has no location permission
+11-28 06:14:02.278 E/PhoneInterfaceManager( 1050): isVoNrEnabled: CommandException: com.android.internal.telephony.CommandException: REQUEST_NOT_SUPPORTED
+11-28 06:14:02.278 E/PhoneInterfaceManager( 1050): isVoNrEnabled: CommandException: com.android.internal.telephony.CommandException: REQUEST_NOT_SUPPORTED
+11-28 06:14:02.284 D/AndroidRuntime( 4969): >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-28 06:14:02.323 I/AndroidRuntime( 4969): Using default boot image
+11-28 06:14:02.323 I/AndroidRuntime( 4969): Leaving lock profiling enabled
+11-28 06:14:02.330 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:02.754 E/AmbientMusicServiceMana( 1615): oxe: java.lang.reflect.InvocationTargetException
+11-28 06:14:02.754 E/AmbientMusicServiceMana( 1615): Caused by: java.lang.reflect.InvocationTargetException
+11-28 06:14:02.754 E/AmbientMusicServiceMana( 1615): Caused by: java.lang.IllegalStateException: No underlying SoundTriggerModule available
+11-28 06:14:02.778 D/AndroidRuntime( 4969): Calling main entry com.android.commands.uiautomator.Launcher
+11-28 06:14:03.115 E/SystemServiceRegistry( 1051): android.os.ServiceManager$ServiceNotFoundException: No service published for: ethernet
+11-28 06:14:03.503 E/JavaBinder( 1051): *** Uncaught remote exception! Exceptions are not yet supported across processes. Client PID 4161 UID 10119.
+11-28 06:14:03.503 E/JavaBinder( 1051): android.database.StaleDataException: Attempted to access a cursor after it has been closed.
+11-28 06:14:03.959 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:04.476 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:05.053 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:05.271 W/AsyncOperation( 1419): OperationException[Status{statusCode=Stale snapshot for com.google.android.projection.gearhead(change count changed - expected 4  but was 3), resolution=null}]
+11-28 06:14:05.427 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:05.630 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:05.924 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:06.303 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:06.748 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:07.174 W/GLSUser ( 1419): [AppCertManager] Exception while requesting key: 
+11-28 06:14:07.174 W/GLSUser ( 1419): java.io.IOException: Invalid device key response.
+11-28 06:14:07.506 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:07.702 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:08.383 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:08.691 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:09.220 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:09.953 W/PeoplePU( 1457): android.content.pm.PackageManager$NameNotFoundException: ComponentInfo{com.google.android.gms/com.google.android.gms.people.sync.focus.ContactsSyncAdapterService}
+11-28 06:14:09.953 W/PeoplePU( 1457): java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ContactsSyncAdapterService}
+11-28 06:14:09.953 W/PeoplePU( 1457): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+11-28 06:14:09.953 W/PeoplePU( 1457): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:14:09.953 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:14:09.953 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:14:09.953 W/PeoplePU( 1457): Caused by: android.os.RemoteException: Remote stack trace:
+11-28 06:14:09.957 W/PeoplePU( 1457): java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ContactsSyncAdapterService}
+11-28 06:14:09.957 W/PeoplePU( 1457): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+11-28 06:14:09.957 W/PeoplePU( 1457): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:14:09.957 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:14:09.957 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:14:09.971 W/PeoplePU( 1457): java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ProxyGalProvider}
+11-28 06:14:09.971 W/PeoplePU( 1457): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+11-28 06:14:09.971 W/PeoplePU( 1457): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:14:09.971 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:14:09.971 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:14:10.422 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:10.707 W/ModernMediaScanner( 1601): Failed to visit /data/data/com.android.providers.downloads/cache/09252026-sms-denylist-metadata.txt: java.nio.file.NoSuchFileException: /data/data/com.android.providers.downloads/cache/09252026-sms-denylist-metadata.txt
+11-28 06:14:10.711 W/ModernMediaScanner( 1601): Failed to visit /data/data/com.android.providers.downloads/cache/09252026-sms-denylist.txt: java.nio.file.NoSuchFileException: /data/data/com.android.providers.downloads/cache/09252026-sms-denylist.txt
+11-28 06:14:10.847 W/ModernMediaScanner( 1601): Failed to visit /data/data/com.android.providers.downloads/cache/08202014-metadata.txt: java.nio.file.NoSuchFileException: /data/data/com.android.providers.downloads/cache/08202014-metadata.txt
+11-28 06:14:10.860 W/PeoplePU( 1457): java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ContactsSyncAdapterService}
+11-28 06:14:10.860 W/PeoplePU( 1457): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+11-28 06:14:10.860 W/PeoplePU( 1457): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:14:10.860 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:14:10.860 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:14:10.860 W/PeoplePU( 1457): java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ContactsSyncAdapterService}
+11-28 06:14:10.860 W/PeoplePU( 1457): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+11-28 06:14:10.860 W/PeoplePU( 1457): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:14:10.860 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:14:10.860 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:14:10.860 W/PeoplePU( 1457): java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ProxyGalProvider}
+11-28 06:14:10.860 W/PeoplePU( 1457): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+11-28 06:14:10.860 W/PeoplePU( 1457): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:14:10.860 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:14:10.860 W/PeoplePU( 1457): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:14:10.869 W/ModernMediaScanner( 1601): Failed to visit /data/data/com.android.providers.downloads/cache/08202014-pins.txt: java.nio.file.NoSuchFileException: /data/data/com.android.providers.downloads/cache/08202014-pins.txt
+11-28 06:14:10.919 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:11.096 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:12.149 W/ModernMediaScanner( 1601): Failed to visit /data/data/com.android.providers.downloads/cache/model.smfb.metadata: java.nio.file.NoSuchFileException: /data/data/com.android.providers.downloads/cache/model.smfb.metadata
+11-28 06:14:12.179 W/ModernMediaScanner( 1601): Failed to visit /data/data/com.android.providers.downloads/cache/model.smfb: java.nio.file.NoSuchFileException: /data/data/com.android.providers.downloads/cache/model.smfb
+11-28 06:14:12.501 W/ModernMediaScanner( 1601): Failed to visit /data/data/com.android.providers.downloads/cache/en.fb.metadata: java.nio.file.NoSuchFileException: /data/data/com.android.providers.downloads/cache/en.fb.metadata
+11-28 06:14:12.524 W/ModernMediaScanner( 1601): Failed to visit /data/data/com.android.providers.downloads/cache/en.fb: java.nio.file.NoSuchFileException: /data/data/com.android.providers.downloads/cache/en.fb
+11-28 06:14:12.641 E/cr_CronetUrlRequestContext( 1727): Exception in upload method
+11-28 06:14:12.732 W/ModernMediaScanner( 1601): Failed to visit /data/data/com.android.providers.downloads/cache/en.model.metadata: java.nio.file.NoSuchFileException: /data/data/com.android.providers.downloads/cache/en.model.metadata
+11-28 06:14:12.750 W/ModernMediaScanner( 1601): Failed to visit /data/data/com.android.providers.downloads/cache/en.model: java.nio.file.NoSuchFileException: /data/data/com.android.providers.downloads/cache/en.model
+11-28 06:14:13.017 D/AndroidRuntime( 4969): Shutting down VM
+11-28 06:14:13.624 W/ActivityManager(  526): Exception when unbinding service com.google.android.gms/.lockbox.service.LockboxBrokerService
+11-28 06:14:13.624 W/ActivityManager(  526): android.os.DeadObjectException
+11-28 06:14:15.378 W/ConfigFileUtils( 5192): Failed to read asset ChimeraModuleSetList.pb: java.io.FileNotFoundException: ChimeraModuleSetList.pb
+11-28 06:14:15.705 W/AsyncOperation( 5191): OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.trustlet_onbody(change count changed - expected 1  but was 0), resolution=null}]
+11-28 06:14:15.849 W/GmsPipelineLogger( 5191): java.lang.NullPointerException
+11-28 06:14:15.898 W/AsyncOperation( 5191): OperationException[Status{statusCode=Stale snapshot for com.google.android.libraries.consentverifier#com.google.android.gms(change count changed - expected 5  but was 1), resolution=null}]
+11-28 06:14:16.158 W/AsyncOperation( 5191): OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.tron.metrics(change count changed - expected 2  but was 0), resolution=null}]
+11-28 06:14:16.608 E/ChimeraUPLUtils( 5192): Failed to invoke updateComplete: android.os.DeadObjectException
+11-28 06:14:16.967 E/ChimeraUPLUtils( 5192): Failed to invoke updateComplete: android.os.DeadObjectException
+11-28 06:14:17.069 E/ChimeraUPLUtils( 5192): Failed to invoke updateComplete: android.os.DeadObjectException
+11-28 06:14:17.278 I/SemanticLocation( 5191): java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/model_bundle_metadata.pb: open failed: ENOENT (No such file or directory)
+11-28 06:14:17.278 I/SemanticLocation( 5191): Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+11-28 06:14:17.585 I/SemanticLocation( 5191): java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/model_bundle_metadata.pb: open failed: ENOENT (No such file or directory)
+11-28 06:14:17.585 I/SemanticLocation( 5191): Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+11-28 06:14:18.821 W/GLSUser ( 5191): [AppCertManager] Exception while requesting key: 
+11-28 06:14:18.821 W/GLSUser ( 5191): java.util.concurrent.ExecutionException: avvw: Parse Proto Exception.
+11-28 06:14:18.821 W/GLSUser ( 5191): Caused by: avvw: Parse Proto Exception.
+11-28 06:14:18.852 W/Conscrypt( 5191): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:14:19.356 W/Conscrypt( 5191): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:14:20.680 E/RecoverySnapshotStorage(  526): java.io.FileNotFoundException: /data/system/recoverablekeystore/snapshots/10131.xml: open failed: ENOENT (No such file or directory)
+11-28 06:14:20.680 E/RecoverySnapshotStorage(  526): Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+11-28 06:14:20.686 W/RecoverableKeyStoreGms( 5192): [WrappingKeyManager] InternalRecoveryServiceException during wrapping key generation [CONTEXT service_id=172 ]
+11-28 06:14:20.686 W/RecoverableKeyStoreGms( 5192): android.security.keystore.recovery.InternalRecoveryServiceException: Failed to import secret key.
+11-28 06:14:20.686 W/RecoverableKeyStoreGms( 5192): 	at android.security.keystore.recovery.RecoveryController.wrapUnexpectedServiceSpecificException(RecoveryController.java:783)
+11-28 06:14:20.686 W/RecoverableKeyStoreGms( 5192): Caused by: android.os.ServiceSpecificException: Failed to import secret key. (code 22)
+11-28 06:14:20.686 W/RecoverableKeyStoreGms( 5192): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3071)
+11-28 06:14:20.686 W/RecoverableKeyStoreGms( 5192): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:14:20.686 W/RecoverableKeyStoreGms( 5192): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:14:20.686 W/RecoverableKeyStoreGms( 5192): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:14:20.768 E/dlpn    ( 5191): RuntimeException while executing runnable dlqc{qze@3cd6bfa} with executor MoreExecutors.directExecutor()
+11-28 06:14:20.768 E/dlpn    ( 5191): java.lang.NullPointerException: Attempt to get length of null array
+11-28 06:14:21.512 D/AndroidRuntime( 5571): >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-28 06:14:21.518 I/AndroidRuntime( 5571): Using default boot image
+11-28 06:14:21.518 I/AndroidRuntime( 5571): Leaving lock profiling enabled
+11-28 06:14:21.649 D/AndroidRuntime( 5571): Calling main entry com.android.commands.uiautomator.Launcher
+11-28 06:14:22.592 W/PeoplePU( 5192): java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ProxyGalProvider}
+11-28 06:14:22.592 W/PeoplePU( 5192): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+11-28 06:14:22.592 W/PeoplePU( 5192): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:14:22.592 W/PeoplePU( 5192): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:14:22.592 W/PeoplePU( 5192): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:14:22.592 W/PeoplePU( 5192): Caused by: android.os.RemoteException: Remote stack trace:
+11-28 06:14:22.966 I/SemanticLocation( 5191): java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/model_bundle_metadata.pb: open failed: ENOENT (No such file or directory)
+11-28 06:14:22.966 I/SemanticLocation( 5191): Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+11-28 06:14:23.104 I/SemanticLocation( 5191): java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/model_bundle_metadata.pb: open failed: ENOENT (No such file or directory)
+11-28 06:14:23.104 I/SemanticLocation( 5191): Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+11-28 06:14:23.132 E/PhenotypeFlagCommitter( 5192): java.util.concurrent.TimeoutException: Timed out waiting for Task
+11-28 06:14:23.456 W/Conscrypt( 5192): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:14:23.491 W/Conscrypt( 5192): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:14:23.501 W/Conscrypt( 5192): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:14:23.572 W/Conscrypt( 5192): Could not set socket write timeout: java.net.SocketException: Socket closed
+11-28 06:14:26.949 W/AsyncOperation( 5191): OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.auth.easyunlock(change count changed - expected 1  but was 0), resolution=null}]
+11-28 06:14:29.547 W/AsyncOperation( 5191): OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.dtdi#com.google.android.gms(change count changed - expected 3  but was 1), resolution=null}]
+11-28 06:14:29.550 W/AsyncOperation( 5191): OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.magictether(change count changed - expected 1  but was 0), resolution=null}]
+11-28 06:14:29.551 W/AsyncOperation( 5191): OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.maps#com.google.android.gms(change count changed - expected 3  but was 1), resolution=null}]
+11-28 06:14:29.552 W/AsyncOperation( 5191): OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.personalsafety(change count changed - expected 1  but was 0), resolution=null}]
+11-28 06:14:29.552 W/AsyncOperation( 5191): OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.phonesky_recovery(change count changed - expected 1  but was 0), resolution=null}]
+11-28 06:14:29.553 W/AsyncOperation( 5191): OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.magictether(change count changed - expected 1  but was 0), resolution=null}]
+11-28 06:14:29.555 W/AsyncOperation( 5191): OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.vision(change count changed - expected 1  but was 0), resolution=null}]
+11-28 06:14:29.555 W/AsyncOperation( 5191): OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.trustagent.activeunlock.primary#com.google.android.gms(change count changed - expected 3  but was 1), resolution=null}]
+11-28 06:14:31.400 W/NetworkScheduler( 5191): java.lang.IllegalArgumentException: Only the following extra parameter types are supported: Integer, Long, Double, String, Boolean, and nested Bundles with the same restrictions.
+11-28 06:14:31.570 E/d       ( 1727): RuntimeException while executing runnable cb{com.google.apps.tiktok.tracing.ej@d699524} with executor MoreExecutors.directExecutor()
+11-28 06:14:31.570 E/d       ( 1727): java.lang.NullPointerException: Attempt to read from field 'java.lang.String com.google.android.libraries.mdi.download.ae.b' on a null object reference in method 'void com.google.android.libraries.mdi.download.h.bq.gH(java.lang.Object)'
+11-28 06:14:31.641 E/d       ( 1727): RuntimeException while executing runnable cb{com.google.apps.tiktok.tracing.ej@f360308} with executor MoreExecutors.directExecutor()
+11-28 06:14:31.641 E/d       ( 1727): java.lang.NullPointerException: Attempt to read from field 'java.lang.String com.google.android.libraries.mdi.download.ae.b' on a null object reference in method 'void com.google.android.libraries.mdi.download.h.bq.gH(java.lang.Object)'
+11-28 06:14:31.706 E/d       ( 1727): RuntimeException while executing runnable cb{com.google.apps.tiktok.tracing.ej@6699a9b} with executor MoreExecutors.directExecutor()
+11-28 06:14:31.706 E/d       ( 1727): java.lang.NullPointerException: Attempt to read from field 'java.lang.String com.google.android.libraries.mdi.download.ae.b' on a null object reference in method 'void com.google.android.libraries.mdi.download.h.bq.gH(java.lang.Object)'
+11-28 06:14:31.774 D/AndroidRuntime( 5571): Shutting down VM
+11-28 06:14:32.732 W/TapAndPay( 5191): java.lang.NullPointerException: NfcAdapter is null
+11-28 06:14:38.918 W/NetworkScheduler( 5191): java.lang.IllegalArgumentException: Only the following extra parameter types are supported: Integer, Long, Double, String, Boolean, and nested Bundles with the same restrictions.
+11-28 06:14:40.351 W/PeoplePU( 5192): java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ContactsSyncAdapterService}
+11-28 06:14:40.351 W/PeoplePU( 5192): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+11-28 06:14:40.351 W/PeoplePU( 5192): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:14:40.351 W/PeoplePU( 5192): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:14:40.351 W/PeoplePU( 5192): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:14:40.351 W/PeoplePU( 5192): Caused by: android.os.RemoteException: Remote stack trace:
+11-28 06:14:40.374 W/PeoplePU( 5192): java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ContactsSyncAdapterService}
+11-28 06:14:40.374 W/PeoplePU( 5192): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+11-28 06:14:40.374 W/PeoplePU( 5192): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:14:40.374 W/PeoplePU( 5192): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:14:40.374 W/PeoplePU( 5192): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:14:40.385 W/PeoplePU( 5192): java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ProxyGalProvider}
+11-28 06:14:40.385 W/PeoplePU( 5192): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+11-28 06:14:40.385 W/PeoplePU( 5192): 	at android.os.Parcel.createException(Parcel.java:3041)
+11-28 06:14:40.385 W/PeoplePU( 5192): 	at android.os.Parcel.readException(Parcel.java:3024)
+11-28 06:14:40.385 W/PeoplePU( 5192): 	at android.os.Parcel.readException(Parcel.java:2966)
+11-28 06:14:40.416 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:40.637 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:40.832 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:41.029 W/CorpusConfigHelper( 1727): android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-28 06:14:41.227 W/NetworkScheduler( 5191): java.lang.IllegalArgumentException: Only the following extra parameter types are supported: Integer, Long, Double, String, Boolean, and nested Bundles with the same restrictions.
