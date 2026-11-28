@@ -1,0 +1,7 @@
+pid=3370
+field bounds before: 39 353 281 403 
+  mInputShown=true
+field after: bounds="[39,353][281,403]" 
+    mGivenContentInsets=[0,419][0,0] mGivenVisibleInsets=[0,419][0,0]
+    topResumedActivity=ActivityRecord{9eb17ea u0 in.dailytable.rider/.MainActivity t8}
+  ResumedActivity: ActivityRecord{9eb17ea u0 in.dailytable.rider/.MainActivity t8}
