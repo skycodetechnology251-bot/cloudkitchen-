@@ -25,8 +25,9 @@ class SiteController extends Controller
     public function home()
     {
         $zones = Cache::remember('site.zones', 600, fn () => Zone::whereIn('status', ['live', 'testing', 'draft'])->orderByRaw("CASE status WHEN 'live' THEN 0 WHEN 'testing' THEN 1 ELSE 2 END")->get(['id', 'name', 'slug', 'status']));
-        $today = DailyMenu::with('dish')->whereDate('service_date', now('Asia/Kolkata')->toDateString())->where('status', 'open')->limit(8)->get()->unique('dish_id');
-        return view('site.home', ['seo' => $this->seo(), 'zones' => $zones, 'menu' => $today]);
+        $branches = $this->branchMenus(\App\Models\Kitchen::where('is_open', true)->orderBy('name')->get());
+        $marquee = $branches->flatMap(fn ($b) => collect($b['meals'])->flatten(1))->pluck('dish.name')->unique()->values();
+        return view('site.home', ['seo' => $this->seo(), 'zones' => $zones, 'branches' => $branches, 'menuNames' => $marquee]);
     }
 
     public function area(Zone $zone)
@@ -35,8 +36,35 @@ class SiteController extends Controller
         $seo = $this->seo();
         $seo['title'] = $zone->seo_title ?: "Healthy lunch delivery in {$zone->name}, Chennai · Daily Table";
         $seo['description'] = $zone->seo_description ?: "Home-style South Indian lunch cooked in {$zone->name}, delivered 12–1 PM. See today's menu and order on the app.";
-        $menu = DailyMenu::with('dish')->whereHas('kitchen.zones', fn ($q) => $q->whereKey($zone->id))->whereDate('service_date', now('Asia/Kolkata')->toDateString())->get()->unique('dish_id');
-        return view('site.area', compact('zone', 'seo', 'menu'));
+        $branches = $this->branchMenus($zone->kitchens()->where('is_open', true)->orderBy('name')->get());
+        $menu = $branches->flatMap(fn ($b) => collect($b['meals'])->flatten(1))->values(); // for structured data
+        return view('site.area', compact('zone', 'seo', 'menu', 'branches'));
+    }
+
+    /**
+     * Each branch's own menu: its next menu day (today, or the next day it has one), grouped by meal.
+     * Menus belong to a branch, so dishes and prices are never mixed between branches.
+     */
+    private function branchMenus($kitchens)
+    {
+        $today = now(config('dailytable.timezone'))->toDateString();
+        $meals = \App\Support\Meals::enabled();
+        return $kitchens->map(function ($k) use ($today, $meals) {
+            $date = DailyMenu::where('kitchen_id', $k->id)->where('status', 'open')->whereDate('service_date', '>=', $today)->orderBy('service_date')->value('service_date');
+            if (! $date) {
+                return null;
+            }
+            $items = DailyMenu::with('dish')->where('kitchen_id', $k->id)->where('status', 'open')->whereDate('service_date', $date)
+                ->whereHas('dish', fn ($q) => $q->where('is_active', true))->get();
+            $grouped = [];
+            foreach ($meals as $key => $m) {
+                $list = $items->where('meal', $key)->values();
+                if ($list->count()) {
+                    $grouped[$key] = $list;
+                }
+            }
+            return $grouped ? ['kitchen' => $k, 'date' => \Carbon\Carbon::parse($date), 'meals' => $grouped] : null;
+        })->filter()->values();
     }
 
     public function page(string $page)

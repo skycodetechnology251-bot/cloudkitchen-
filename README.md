@@ -234,3 +234,11 @@ The Overview opens with "What to do today" (menus to publish, orders waiting, di
 
 - Admin → Branding → **Mobile app login screen**: up to 5 photos that slowly change, plus the headline and the line under it. The app loads them each time it opens.
 - Admin → Integrations → **Google Drive**: add an OAuth client (Web application, Drive API enabled, redirect address shown on the page), press Connect Google Drive. New dish, banner, logo and login photos go to a "Daily Table photos" folder in that Drive, shared as view-only links. "Move existing photos to Drive" copies older photos. If Drive is unavailable, photos are saved on the server instead.
+
+## Branches, menus and location (customer app)
+
+- Every menu belongs to a branch kitchen. The app always shows the menu of the branch that delivers to the place it is serving, and the server refuses a basket from a branch that does not deliver to the chosen address.
+- **Automatic nearest branch:** the Today screen uses, in order: an address the customer picked by hand; a saved address they are standing at; their current GPS location (nearest open branch connects automatically; they save the location as an address at checkout); their default address. It re-checks when the phone moves about 500 m or the app comes back to the front.
+- **Several branches deliver there:** "Delivering from … · Change" lets the customer pick another branch; the choice is remembered for that address. Changing branch empties the basket.
+- **No branch delivers there:** a clear "Sorry, our service is not available at your location yet" card with buttons to pick another address or use the current location.
+- **Website:** the home page and area pages show each branch's own menu in tabs, grouped by meal.

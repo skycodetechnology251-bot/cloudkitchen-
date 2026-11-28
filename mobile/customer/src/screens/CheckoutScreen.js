@@ -36,6 +36,8 @@ export default function CheckoutScreen({ navigation }) {
   const [busy, setBusy] = useState(false);
 
   useFocusEffect(useCallback(() => {
+    // Delivering to the current location (not saved yet): ask to save it, never fall back to another address.
+    if (cart.gps && !cart.addressId) { setAddress(null); return; }
     api('/addresses').then((l) => setAddress(l.find((a) => a.id === cart.addressId) || l.find((a) => a.is_default) || l[0] || null)).catch(() => {});
   }, [cart.addressId]));
 
@@ -56,7 +58,7 @@ export default function CheckoutScreen({ navigation }) {
   }, [cart.lines, applied, points, address?.id, pay]);
 
   const place = async (ack = false) => {
-    if (!address) { navigation.navigate('AddressForm'); return; }
+    if (!address) { navigation.navigate('AddressForm', cart.gps ? { at: cart.gps } : undefined); return; }
     if (address.zone?.status !== 'live') { setError("We don't deliver to this address yet."); return; }
     try {
       setBusy(true); setError('');
@@ -96,10 +98,10 @@ export default function CheckoutScreen({ navigation }) {
       <Header title="Review your order" onBack={() => navigation.goBack()} />
 
       <Rise index={0}>
-        <Pressable onPress={() => navigation.navigate('Addresses', { pick: true })} accessibilityRole="button" accessibilityLabel="Change delivery address">
+        <Pressable onPress={() => (!address && cart.gps ? navigation.navigate('AddressForm', { at: cart.gps }) : navigation.navigate('Addresses', { pick: true }))} accessibilityRole="button" accessibilityLabel="Change delivery address">
           <Glass style={{ borderRadius: 22, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.85)', alignItems: 'center', justifyContent: 'center' }}><Icon name={address?.label === 'Home' ? 'home' : 'pin'} size={20} /></View>
-            <View style={{ flex: 1 }}><Text style={{ fontWeight: '800', fontSize: 16, color: C.ink }}>{address?.label || 'Add a delivery address'}</Text><Text numberOfLines={2} style={{ fontSize: 13, color: C.muted }}>{address ? address.one_line : 'Needed to check delivery'}</Text></View>
+            <View style={{ flex: 1 }}><Text style={{ fontWeight: '800', fontSize: 16, color: C.ink }}>{address?.label || (cart.gps ? 'Save your current location' : 'Add a delivery address')}</Text><Text numberOfLines={2} style={{ fontSize: 13, color: C.muted }}>{address ? address.one_line : 'Needed to check delivery'}</Text></View>
             <Text style={{ color: C.teal, fontWeight: '800' }}>{address ? 'Change' : 'Add'}</Text>
           </Glass>
         </Pressable>

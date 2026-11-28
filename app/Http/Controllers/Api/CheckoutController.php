@@ -30,6 +30,22 @@ class CheckoutController extends Controller
         ]);
     }
 
+    /** The branch must deliver to the chosen address (its menu, prices and stock are per branch). */
+    private function ensureServes(Request $r, array $d): void
+    {
+        if (empty($d['address_id'])) {
+            return;
+        }
+        $a = $r->user()->addresses()->find($d['address_id']);
+        if (! $a) {
+            throw ValidationException::withMessages(['address_id' => 'Choose one of your saved addresses.']);
+        }
+        $ids = app(\App\Services\ServiceabilityService::class)->kitchensFor((float) $a->lat, (float) $a->lng)->pluck('id');
+        if (! $ids->contains((int) $d['kitchen_id'])) {
+            throw ValidationException::withMessages(['kitchen_id' => 'This branch does not deliver to this address. Go back to Today, check the branch, and add the dishes again.']);
+        }
+    }
+
     private function items(array $d): array
     {
         $items = [];
@@ -42,6 +58,7 @@ class CheckoutController extends Controller
     public function quote(Request $r, PricingService $pricing)
     {
         $d = $this->input($r);
+        $this->ensureServes($r, $d);
         $q = $pricing->quote($r->user(), Kitchen::findOrFail($d['kitchen_id']), $this->items($d), $d + ['order_type' => 'delivery']);
         $wallet = $r->user()->walletOrCreate();
         $q['wallet'] = ['balance_paise' => $wallet->balance_paise, 'would_use_paise' => min($wallet->balance_paise, $q['total_paise'])];
@@ -51,6 +68,7 @@ class CheckoutController extends Controller
     public function place(Request $r, OrderService $orders, PricingService $pricing)
     {
         $d = $this->input($r);
+        $this->ensureServes($r, $d);
         $kitchen = Kitchen::findOrFail($d['kitchen_id']);
         $q = $pricing->quote($r->user(), $kitchen, $this->items($d), $d);
         if (collect($q['warnings'])->contains('type', 'allergy') && empty($d['allergy_acknowledged'])) {

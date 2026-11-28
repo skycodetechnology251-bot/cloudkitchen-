@@ -37,7 +37,7 @@ export default function AddressesScreen({ navigation, route }) {
   const choose = (a) => {
     if (!pick) { navigation.navigate('AddressForm', { address: a }); return; }
     if (cart.count && cart.addressId && cart.addressId !== a.id) cart.clear();
-    cart.setAddressId(a.id); navigation.goBack();
+    cart.setAddressId(a.id); cart.setManual(true); cart.setGps(null); navigation.goBack();
   };
   const remove = (a) => Alert.alert('Remove address?', `${a.label} will be removed from your list. Past orders keep their address.`, [{ text: 'Keep', style: 'cancel' }, { text: 'Remove', style: 'destructive', onPress: async () => { await api(`/addresses/${a.id}`, { method: 'DELETE' }); load(); } }]);
   const here = list.find((a) => a.id === hereId);

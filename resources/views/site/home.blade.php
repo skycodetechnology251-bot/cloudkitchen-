@@ -5,7 +5,7 @@
 @section('content')
 @php
   $live = $zones->where('status', 'live')->pluck('name');
-  $marquee = $menu->pluck('dish.name')->filter()->values();
+  $marquee = $menuNames;
   if ($marquee->count() < 5) {
       $marquee = collect(['Millet meals', 'Sambar rice & poriyal', 'Lemon & curd rice', 'Chickpea sundal', 'Ragi malt', 'Seasonal fruit cup', 'Neer mor', 'Bisi bele bath']);
   }
@@ -197,26 +197,14 @@
 </section>
 
 {{-- TODAY'S MENU --}}
-@if($menu->isNotEmpty())
-<section class="s-sec">
+@if($branches->isNotEmpty())
+<section class="s-sec" id="menu">
   <div class="s-wrap">
-    <div class="row between" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px">
-      <div><span class="s-kicker k-tomato">🍛 On the menu today</span><h2 class="s-h2">Cooked fresh this morning</h2></div>
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px">
+      <div><span class="s-kicker k-tomato">🍛 On the menu</span><h2 class="s-h2">Cooked fresh at each branch</h2><p class="s-lead" style="max-width:640px">Every branch cooks its own menu. The app shows the menu of the branch that delivers to your address.</p></div>
       <a href="{{ $seo['android_url'] }}" class="s-btn carrot">Order in the app</a>
     </div>
-    <div class="menu" style="margin-top:28px">
-      @foreach($menu as $m)
-        <div class="dish">
-          @if($m->dish->image_url)<img src="{{ $m->dish->image_url }}" alt="{{ $m->dish->name }}" width="76" height="76" loading="lazy">@else @include('partials.plate', ['size' => 76]) @endif
-          <div style="min-width:0;flex:1">
-            <h3>{{ $m->dish->name }}</h3>
-            <div class="meta"><span class="tag {{ $m->dish->diet }}">{{ ['veg' => 'Veg', 'egg' => 'Egg', 'nonveg' => 'Non-veg'][$m->dish->diet] ?? 'Veg' }}</span>@if($m->dish->kcal)<span class="tag kcal">{{ $m->dish->kcal }} kcal</span>@endif</div>
-            @include('partials.balance', ['dish' => $m->dish])
-          </div>
-          <span class="price">₹{{ number_format($m->price_paise / 100) }}</span>
-        </div>
-      @endforeach
-    </div>
+    @include('site.partials.branch-menus', ['branches' => $branches])
   </div>
 </section>
 @endif

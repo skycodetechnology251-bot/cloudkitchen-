@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, DeviceEventEmitter, Dimensions, Easing, Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { Animated, AppState, DeviceEventEmitter, Dimensions, Easing, Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
 import { api, localToday, rupees, windowShort } from '../shared/api';
@@ -9,6 +9,7 @@ import Plate, { plateColors } from '../shared/Plate';
 import { C } from '../shared/theme';
 import { Screen } from './_Screen';
 import { useAuth } from '../auth';
+import * as SecureStore from 'expo-secure-store';
 import { useCart } from '../cart';
 import { addGlass, getLog, getSettings, todayKey, WATER_EVENT } from '../water';
 import { getLog as getWorkoutLog, getSettings as getWorkoutSettings, minutesOn, streak as workoutStreak, WORKOUT_EVENT } from '../workout';
@@ -154,6 +155,12 @@ export default function HomeScreen({ navigation }) {
   const [banners, setBanners] = useState([]);
   const [popup, setPopup] = useState(null);
   const [address, setAddress] = useState(null);
+  const [kitchens, setKitchens] = useState([]);
+  const [noService, setNoService] = useState(null);
+  const [reload, setReload] = useState(0);
+  const asked = useRef(false);
+  const lastPos = useRef(null);
+  const [branchSheet, setBranchSheet] = useState(false);
   const [here, setHere] = useState(false);
   const [menu, setMenu] = useState(null);
   const [wallet, setWallet] = useState(null);
@@ -165,10 +172,16 @@ export default function HomeScreen({ navigation }) {
   const scroller = useRef(null);
   const shown = useRef(false);
 
-  const loadMenu = async (a) => {
-    if (!a?.zone || a.zone.status !== 'live') { setMenu(null); return; }
+  const loadMenu = async (a, pickId) => {
+    if (!a) { setMenu(null); setKitchens([]); setNoService(null); return; }
     const s = await api('/serviceability', { method: 'POST', body: { lat: a.lat, lng: a.lng } });
-    const k = s.kitchens?.[0];
+    const list = s.kitchens || [];
+    setKitchens(list);
+    // No open branch delivers here: say so clearly.
+    setNoService(list.length ? null : { zone: s.zone || null, where: a.id ? `${a.label} · ${a.area || ''}` : (a.area || 'your current location') });
+    // The branch the customer chose for this address (if it still delivers there), else the nearest.
+    const saved = pickId || (a.id ? Number(await SecureStore.getItemAsync(`kitchen_for_${a.id}`).catch(() => null)) : 0);
+    const k = list.find((x) => x.id === saved) || list[0];
     if (!k) { setMenu(null); return; }
     if (cart.kitchenId && cart.kitchenId !== k.id) cart.clear();
     cart.setKitchenId(k.id);
@@ -176,22 +189,44 @@ export default function HomeScreen({ navigation }) {
     setMenu({ ...m, kitchen: k, slots: s.slots || [] }); setResponse(m.today_response);
   };
 
-  /** The saved address the customer is standing at wins; then the one they picked; then their default. */
+  /**
+   * Which place to serve:
+   * 1. an address the customer picked themselves (until they tap "Use my current location");
+   * 2. a saved address they are standing at;
+   * 3. their current GPS location (nearest branch connects automatically; saved on checkout);
+   * 4. their default address when location is off.
+   */
   const pickAddress = async () => {
     const list = await api('/addresses');
-    let chosen = null; let isHere = false;
+    let pos = null;
     try {
-      const perm = await Location.getForegroundPermissionsAsync();
-      if (perm.granted) {
-        const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      let perm = await Location.getForegroundPermissionsAsync();
+      if (!perm.granted && perm.canAskAgain && !asked.current) { asked.current = true; perm = await Location.requestForegroundPermissionsAsync(); }
+      if (perm.granted) pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+    } catch (e) {}
+    if (pos) lastPos.current = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+
+    let chosen = null; let isHere = false;
+    if (cart.manual) chosen = list.find((a) => a.id === cart.addressId) || null;
+    if (!chosen && pos) {
+      try {
         const r = await api('/addresses/detect', { method: 'POST', body: { lat: pos.coords.latitude, lng: pos.coords.longitude } });
         if (r.address) { chosen = list.find((a) => a.id === r.address.id) || r.address; isHere = true; }
+      } catch (e) {}
+      if (!chosen) {
+        let area = 'Current location';
+        try { const [g] = await Location.reverseGeocodeAsync({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }); if (g) area = g.district || g.subregion || g.city || g.name || area; } catch (e) {}
+        chosen = { id: null, gps: true, label: 'Current location', area, lat: pos.coords.latitude, lng: pos.coords.longitude };
       }
-    } catch (e) {}
-    chosen = (!isHere && list.find((a) => a.id === cart.addressId)) || chosen || list.find((a) => a.is_default) || list[0] || null;
-    setAddress(chosen); setHere(isHere); if (chosen) cart.setAddressId(chosen.id);
+    }
+    if (!chosen) chosen = list.find((a) => a.id === cart.addressId) || list.find((a) => a.is_default) || list[0] || null;
+    setAddress(chosen); setHere(isHere);
+    if (chosen?.gps) { cart.setGps({ lat: chosen.lat, lng: chosen.lng, area: chosen.area }); cart.setAddressId(null); }
+    else { cart.setGps(null); if (chosen) cart.setAddressId(chosen.id); }
     return chosen;
   };
+
+  const useCurrentLocation = () => { cart.setManual(false); setReload((n) => n + 1); };
 
   const load = useCallback(async () => {
     setBusy(true);
@@ -202,9 +237,27 @@ export default function HomeScreen({ navigation }) {
       await loadMenu(await pickAddress());
       refresh();
     } catch (e) {} finally { setBusy(false); }
-  }, [cart.addressId]);
+  }, [cart.addressId, cart.manual, reload]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
+  // Moved about 500 m, or came back to the app: re-check the nearest branch (unless an address was picked by hand).
+  useFocusEffect(useCallback(() => {
+    let sub = null; let alive = true;
+    (async () => {
+      try {
+        const perm = await Location.getForegroundPermissionsAsync();
+        if (!perm.granted || !alive) return;
+        sub = await Location.watchPositionAsync({ accuracy: Location.Accuracy.Balanced, distanceInterval: 500, timeInterval: 60000 }, (p) => {
+          const prev = lastPos.current; const cur = { lat: p.coords.latitude, lng: p.coords.longitude };
+          if (cart.manual || !prev) { lastPos.current = cur; return; }
+          const dKm = Math.hypot((cur.lat - prev.lat) * 111, (cur.lng - prev.lng) * 111 * Math.cos(cur.lat * Math.PI / 180));
+          if (dKm >= 0.5) { lastPos.current = cur; setReload((n) => n + 1); }
+        });
+      } catch (e) {}
+    })();
+    const app = AppState.addEventListener('change', (st) => { if (st === 'active' && !cart.manual) setReload((n) => n + 1); });
+    return () => { alive = false; sub?.remove?.(); app.remove(); };
+  }, [cart.manual]));
   useEffect(() => {
     if (banners.length < 2) return;
     const t = setInterval(() => setPage((p) => (p + 1) % banners.length), 4000);
@@ -233,7 +286,7 @@ export default function HomeScreen({ navigation }) {
           <Text style={{ fontSize: 18, fontWeight: '800', color: C.ink }} numberOfLines={1}>{hello}, {first}</Text>
           <Pressable onPress={() => navigation.navigate('Addresses', { pick: true })} accessibilityRole="button" accessibilityLabel="Change delivery address" style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }} hitSlop={6}>
             {address ? <Pulse /> : null}
-            <Text numberOfLines={1} style={{ fontSize: 13, color: C.muted, fontWeight: '600', flexShrink: 1 }}>{address ? `${address.label} · ${address.area}${here ? " · you're here" : ''}` : 'Add a delivery address'}</Text>
+            <Text numberOfLines={1} style={{ fontSize: 13, color: C.muted, fontWeight: '600', flexShrink: 1 }}>{address ? (address.gps ? `📍 Near ${address.area}` : `${address.label} · ${address.area}${here ? " · you're here" : ''}`) : 'Add a delivery address'}</Text>
             <Icon name="chevron" size={14} color={C.muted} />
           </Pressable>
         </View>
@@ -253,10 +306,69 @@ export default function HomeScreen({ navigation }) {
         </Rise>
       ) : null}
 
+      {menu?.kitchen ? (
+        <Rise index={2}>
+          <Pressable onPress={() => kitchens.length > 1 && setBranchSheet(true)} accessibilityRole="button" accessibilityLabel={`Delivering from ${menu.kitchen.name}${kitchens.length > 1 ? '. Change branch' : ''}`}>
+            <Glass style={{ flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 18, paddingVertical: 10, paddingHorizontal: 14 }}>
+              <Text style={{ fontSize: 20 }}>🏪</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 12, color: C.muted, fontWeight: '700' }}>Delivering from</Text>
+                <Text style={{ fontSize: 15, color: C.ink, fontWeight: '800' }} numberOfLines={1}>{menu.kitchen.name}{menu.kitchen.distance_m ? ` · ${(menu.kitchen.distance_m / 1000).toFixed(1)} km` : ''}</Text>
+              </View>
+              {kitchens.length > 1 ? <Text style={{ color: C.teal, fontWeight: '800' }}>Change ›</Text> : null}
+            </Glass>
+          </Pressable>
+          {address?.gps ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, paddingHorizontal: 4 }}>
+              <Muted style={{ flex: 1, fontSize: 12 }}>Using your current location — the nearest branch is connected automatically.</Muted>
+              <Pressable onPress={() => navigation.navigate('AddressForm', { at: { lat: address.lat, lng: address.lng } })} accessibilityRole="button" hitSlop={6}><Text style={{ color: C.teal, fontWeight: '800', fontSize: 13 }}>Save this location</Text></Pressable>
+            </View>
+          ) : cart.manual ? (
+            <Pressable onPress={useCurrentLocation} accessibilityRole="button" style={{ marginTop: 8, paddingHorizontal: 4 }} hitSlop={6}><Text style={{ color: C.teal, fontWeight: '800', fontSize: 13 }}>📍 Use my current location instead</Text></Pressable>
+          ) : null}
+        </Rise>
+      ) : null}
+
+      <Modal transparent visible={branchSheet} animationType="slide" onRequestClose={() => setBranchSheet(false)}>
+        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.35)' }} onPress={() => setBranchSheet(false)} accessibilityLabel="Close" />
+        <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 22, gap: 10 }}>
+          <Text style={{ fontSize: 20, fontWeight: '800', color: C.ink }}>Choose a branch</Text>
+          <Muted>These kitchens deliver to {address?.label || 'your address'}. Each has its own menu.{cart.count ? ' Changing branch empties your basket.' : ''}</Muted>
+          {kitchens.map((k) => {
+            const on = k.id === menu?.kitchen?.id;
+            return (
+              <Pressable key={k.id} accessibilityRole="radio" accessibilityState={{ selected: on }}
+                onPress={async () => { setBranchSheet(false); if (on) return; await SecureStore.setItemAsync(`kitchen_for_${address.id}`, String(k.id)).catch(() => {}); setBusy(true); try { await loadMenu(address, k.id); } finally { setBusy(false); } }}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 18, borderWidth: 2, borderColor: on ? C.teal : 'rgba(18,48,42,0.1)', backgroundColor: on ? 'rgba(15,92,77,0.06)' : '#fff' }}>
+                <Text style={{ fontSize: 22 }}>🏪</Text>
+                <View style={{ flex: 1 }}><Text style={{ fontWeight: '800', fontSize: 16, color: C.ink }}>{k.name}</Text><Muted style={{ fontSize: 12 }}>{k.distance_m ? `${(k.distance_m / 1000).toFixed(1)} km away` : ''}</Muted></View>
+                {on ? <Text style={{ color: C.teal, fontWeight: '800' }}>✓ Selected</Text> : null}
+              </Pressable>
+            );
+          })}
+          <View style={{ height: 10 }} />
+        </View>
+      </Modal>
+
       {!address ? (
         <Rise index={2}><Glass style={{ padding: 18, gap: 10, borderRadius: 26 }}><H2>Where should we deliver?</H2><Muted>Add your home or office. We'll check if a Daily Table kitchen delivers there.</Muted><Btn title="Add address" onPress={() => navigation.navigate('AddressForm')} /></Glass></Rise>
       ) : !menu ? (
-        <Rise index={2}><Glass style={{ padding: 18, gap: 8, borderRadius: 26 }}><H2>{address.zone ? `${address.zone.name} is coming soon` : 'Not in our area yet'}</H2><Muted>We're opening areas one at a time. We'll let you know when lunch delivery starts at {address.label}.</Muted></Glass></Rise>
+        <Rise index={2}>
+          <Glass style={{ padding: 20, gap: 10, borderRadius: 26, alignItems: 'center' }}>
+            <Text style={{ fontSize: 46 }}>📍</Text>
+            <Text style={{ fontSize: 20, fontWeight: '800', color: C.ink, textAlign: 'center' }}>Sorry, our service is not available at your location yet</Text>
+            <Muted style={{ textAlign: 'center' }}>
+              {noService?.zone && noService.zone.status !== 'live'
+                ? `${noService.zone.name} is opening soon. We'll start delivering there as soon as a branch is ready.`
+                : `No Daily Table branch delivers to ${noService?.where || 'this place'} right now. We are opening new areas one at a time.`}
+            </Muted>
+            <View style={{ alignSelf: 'stretch', gap: 8, marginTop: 4 }}>
+              <Btn title="Choose another address" onPress={() => navigation.navigate('Addresses', { pick: true })} />
+              {cart.manual ? <Btn kind="ghost" title="📍 Use my current location" onPress={useCurrentLocation} /> : null}
+              {!address.gps ? null : <Btn kind="ghost" title="Add an address" onPress={() => navigation.navigate('AddressForm')} />}
+            </View>
+          </Glass>
+        </Rise>
       ) : (
         <Rise index={2}>
           <View style={{ backgroundColor: C.teal, borderRadius: 26, paddingVertical: 16, paddingHorizontal: 18, gap: 12 }}>

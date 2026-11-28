@@ -17,13 +17,14 @@ export default function AddressFormScreen({ navigation, route }) {
   const cart = useCart();
   const map = useRef(null);
   const geoTimer = useRef(null);
-  const [f, setF] = useState(editing ? { ...EMPTY, ...Object.fromEntries(Object.entries(editing).filter(([k]) => k in EMPTY).map(([k, v]) => [k, v ?? ''])) } : EMPTY);
+  const [f, setF] = useState(editing ? { ...EMPTY, ...Object.fromEntries(Object.entries(editing).filter(([k]) => k in EMPTY).map(([k, v]) => [k, v ?? ''])) } : at ? { ...EMPTY, lat: at.lat, lng: at.lng } : EMPTY);
   const [status, setStatus] = useState('');
   const [locating, setLocating] = useState(false);
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
   const up = (k) => (v) => setF((s) => ({ ...s, [k]: v }));
-  const start = editing ? { lat: +editing.lat, lng: +editing.lng } : { lat: 13.0067, lng: 80.2573 };
+  const at = route.params?.at; // { lat, lng } from "Save this location"
+  const start = editing ? { lat: +editing.lat, lng: +editing.lng } : at ? { lat: +at.lat, lng: +at.lng } : { lat: 13.0067, lng: 80.2573 };
 
   /** After the pin settles: fill street / area / city / pincode (only empty fields) and check delivery. */
   const onPin = ({ lat, lng }) => {
@@ -41,6 +42,7 @@ export default function AddressFormScreen({ navigation, route }) {
     }, 600);
   };
   useEffect(() => () => clearTimeout(geoTimer.current), []);
+  useEffect(() => { if (at) onPin(start); }, []); // opened from "Save this location": fill street / area now
 
   const locate = async () => {
     try {
@@ -60,7 +62,7 @@ export default function AddressFormScreen({ navigation, route }) {
       setBusy(true); setErrors({});
       const body = { ...f, receiver_phone: f.receiver_phone || null, is_default: !!f.is_default };
       const a = editing ? await api(`/addresses/${editing.id}`, { method: 'PUT', body }) : await api('/addresses', { method: 'POST', body });
-      if (!editing) { if (cart.count) cart.clear(); cart.setAddressId(a.id); }
+      if (!editing) { if (cart.count && !at) cart.clear(); cart.setAddressId(a.id); cart.setGps(null); cart.setManual(false); }
       navigation.goBack();
     } catch (e) { setErrors({ ...Object.fromEntries(Object.entries(e.errors || {}).map(([k, v]) => [k, v[0]])), _: e.message }); } finally { setBusy(false); }
   };

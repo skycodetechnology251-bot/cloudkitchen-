@@ -8,13 +8,15 @@ export function CartProvider({ children }) {
   const [kitchenId, setKitchenId] = useState(null);
   const [addressId, setAddressId] = useState(null);
   const [lines, setLines] = useState({}); // daily_menu_id -> { item, qty }
-  const [meal, setMeal] = useState(null); // one meal per basket (breakfast, lunch, snacks, dinner)
+  const [meal, setMeal] = useState(null);
+  const [manual, setManual] = useState(false); // true when the customer picked an address themselves
+  const [gps, setGps] = useState(null); // { lat, lng, area } when delivering to the current location (not saved yet) // one meal per basket (breakfast, lunch, snacks, dinner)
 
   const value = useMemo(() => {
     const count = Object.values(lines).reduce((a, l) => a + l.qty, 0);
     const subtotal = Object.values(lines).reduce((a, l) => a + l.qty * l.item.price_paise, 0);
     return {
-      kitchenId, setKitchenId, addressId, setAddressId, lines, count, subtotal, meal: count ? meal : null,
+      kitchenId, setKitchenId, addressId, setAddressId, lines, count, subtotal, meal: count ? meal : null, manual, setManual, gps, setGps,
       qty: (id) => lines[id]?.qty || 0,
       /** True when this item is for another meal than the basket (the basket would be replaced). */
       otherMeal: (item) => count > 0 && !!meal && !!item.meal && item.meal !== meal,
@@ -30,7 +32,7 @@ export function CartProvider({ children }) {
       clear: () => setLines({}),
       payload: () => Object.entries(lines).map(([id, l]) => ({ daily_menu_id: Number(id), quantity: l.qty })),
     };
-  }, [kitchenId, addressId, lines, meal]);
+  }, [kitchenId, addressId, lines, meal, manual, gps]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
